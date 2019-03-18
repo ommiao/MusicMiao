@@ -30,8 +30,10 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
 
     @Override
     protected void initViews() {
+        mBinding.ivCat.setOnClickListener(this);
         mBinding.ivSearch.setOnClickListener(this);
         mBinding.etSearch.setOnEditorActionListener(this);
+        mBinding.stvTitle.setAnimationListener(this);
     }
 
     @Override
@@ -42,24 +44,36 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            case R.id.iv_cat:
+                onCatClick();
+                break;
             case R.id.iv_search:
                 onSearchClick();
                 break;
         }
     }
 
-    public void onSearchClick() {
-        if(!isSearchEditViewShow){
-            showSearchEditView();
+    private void onCatClick() {
+        if(isSearchEditViewShow && StringUtil.isEmpty(mBinding.etSearch.getText().toString())){
+            closeKeyboard();
+            mBinding.etSearch.setText("");
+            mBinding.stvTitle.setVisibility(View.VISIBLE);
+            mBinding.etSearch.setVisibility(View.GONE);
+            toggleSearchEditView();
         }
     }
 
-    private void showSearchEditView(){
+    public void onSearchClick() {
+        if(!isSearchEditViewShow){
+            toggleSearchEditView();
+        }
+    }
+
+    private void toggleSearchEditView(){
         isSearchEditViewShow = !isSearchEditViewShow;
         final int[] stateSet = {android.R.attr.state_checked * (isSearchEditViewShow ? 1 : -1)};
         mBinding.ivSearch.setImageState(stateSet, true);
         mBinding.stvTitle.animateText(isSearchEditViewShow ? getString(R.string.search_hint) : getString(R.string.search_title));
-        mBinding.stvTitle.setAnimationListener(this);
     }
 
     @Override
@@ -70,10 +84,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
             mBinding.etSearch.setFocusable(true);
             mBinding.etSearch.setFocusableInTouchMode(true);
             mBinding.etSearch.requestFocus();
-            InputMethodManager imm =
-                    (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            assert imm != null;
-            imm.showSoftInput(mBinding.etSearch, 0);
+            openKeyboard();
         }
     }
 
@@ -89,9 +100,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
     }
 
     private void search() {
-        InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        assert imm != null;
-        imm.hideSoftInputFromWindow(mActivity.getWindow().getDecorView().getWindowToken(), 0);
+        closeKeyboard();
         mBinding.progressBar.setVisibility(View.VISIBLE);
     }
 
@@ -101,5 +110,18 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
             return false;
         }
         return true;
+    }
+
+    private void openKeyboard(){
+        InputMethodManager imm =
+                (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
+        imm.showSoftInput(mBinding.etSearch, 0);
+    }
+
+    private void closeKeyboard(){
+        InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
+        imm.hideSoftInputFromWindow(mActivity.getWindow().getDecorView().getWindowToken(), 0);
     }
 }
