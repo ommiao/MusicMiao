@@ -5,4 +5,6 @@
     <string name="search_title">Music Miao</string>
     <string name="search_hint">Keywords</string>
     <string name="search_input_keywords">请输入关键字</string>
+    <string name="music_no_singer">无歌手信息</string>
+    <string name="music_no_album">无专辑信息</string>
 </resources>
