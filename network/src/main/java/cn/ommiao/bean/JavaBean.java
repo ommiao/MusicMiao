@@ -1,7 +1,6 @@
-package cn.ommiao.musicmiao.utils;
+package cn.ommiao.bean;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,15 +10,14 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
-public class GsonUtil {
+public abstract class JavaBean {
 
-    public static String toJson(Object object){
+    public String toJson(){
         Gson gson = newGsonExcludeTransient();
-        return gson.toJson(object);
+        return gson.toJson(this);
     }
 
-    @Nullable
-    public static <T> T fromJson(String json, Class<T> classOfT){
+    public static <T extends JavaBean> T fromJson(String json, Class<T> classOfT){
         Gson gson = newGsonExcludeTransient();
         T t;
         try {

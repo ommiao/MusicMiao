@@ -13,6 +13,11 @@ import android.view.ViewGroup;
 
 import com.gyf.barlibrary.ImmersionBar;
 
+import cn.ommiao.network.BaseRequest;
+import cn.ommiao.network.RequestCallBack;
+import cn.ommiao.network.RequestInBase;
+import cn.ommiao.network.RequestOutBase;
+
 public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
 
     protected BaseActivity mActivity;
@@ -45,5 +50,17 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         ImmersionBar.with(this).destroy();
+    }
+
+    protected <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, IN in, RequestCallBack<OUT> callBack) {
+        mActivity.newCall(request, in, callBack);
+    }
+
+    protected <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, IN in, RequestCallBack<OUT> callBack) {
+        mActivity.newCall(request, showLoading, in, callBack);
+    }
+
+    protected  <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, String msg, IN in, RequestCallBack<OUT> callBack) {
+        mActivity.newCall(request, showLoading, msg, in, callBack);
     }
 }
