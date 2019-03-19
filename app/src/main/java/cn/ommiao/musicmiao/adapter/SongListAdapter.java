@@ -26,8 +26,8 @@ public class SongListAdapter extends BaseQuickAdapter<Song, BaseViewHolder> {
     protected void convert(BaseViewHolder helper, Song item) {
         SquareImageView albumView = helper.getView(R.id.siv_music_album);
         Glide.with(mContext).load(item.getAlbumImageUrl())
-                .placeholder(R.drawable.pic_music_album)
-                .error(R.drawable.pic_music_album)
+                .placeholder(R.drawable.ic_music_s)
+                .error(R.drawable.ic_music_s)
                 .into(albumView);
         helper.setText(R.id.tv_music_title, item.getTitle());
         String singer = StringUtil.isEmpty(item.getOneSinger()) ? mContext.getString(R.string.music_no_singer) : item.getOneSinger();
