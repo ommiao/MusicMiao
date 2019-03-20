@@ -50,6 +50,8 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         Picasso.with(getContext())
                 .load(url)
                 .noFade()
+                .placeholder(R.drawable.ic_music_s)
+                .error(R.drawable.ic_music_s)
                 .into(mBinding.ivAlbum, new Callback() {
                     @Override
                     public void onSuccess() {

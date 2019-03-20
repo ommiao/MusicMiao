@@ -28,6 +28,8 @@ public class SongListAdapter extends BaseQuickAdapter<Song, BaseViewHolder> {
         SquareImageView albumView = helper.getView(R.id.siv_music_album);
         Picasso.with(mContext)
                 .load(item.getAlbumImageUrl())
+                .placeholder(R.drawable.ic_music_s)
+                .error(R.drawable.ic_music_s)
                 .into(albumView);
         helper.setText(R.id.tv_music_title, item.getTitle());
         String singer = StringUtil.isEmpty(item.getOneSinger()) ? mContext.getString(R.string.music_no_singer) : item.getOneSinger();

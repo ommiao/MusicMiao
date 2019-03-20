@@ -83,8 +83,8 @@ public class Song extends JavaBean {
     }
 
     public String getAlbumImageUrl(){
-        return  "https://y.gtimg.cn/music/photo_new/T002R300x300M000" +
-                getAlbum().getMid()
-                + ".jpg";
+        return  !StringUtil.isEmpty(getAlbum().getTitle()) ?
+                "https://y.gtimg.cn/music/photo_new/T002R300x300M000" + getAlbum().getMid() + ".jpg" :
+                "http://134.175.41.67/static/ic_music_s.jpg";
     }
 }
