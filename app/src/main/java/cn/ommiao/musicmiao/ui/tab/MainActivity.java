@@ -30,7 +30,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         mBinding.viewPager.setAdapter(new MainTabPagerAdapter(getSupportFragmentManager(), fragments));
         mBinding.viewPager.addOnPageChangeListener(this);
         mBinding.bottomBar.setOnNavigationItemSelectedListener(this);
-        mBinding.bottomBar.setItemIconSizeRes(R.dimen.tab_icon_size);
+        mBinding.bottomBar.setItemIconSizeRes(R.dimen.tab_icon);
     }
 
     @Override

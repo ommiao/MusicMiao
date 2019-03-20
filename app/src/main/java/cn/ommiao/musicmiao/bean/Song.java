@@ -3,6 +3,7 @@ package cn.ommiao.musicmiao.bean;
 import java.util.ArrayList;
 
 import cn.ommiao.bean.JavaBean;
+import cn.ommiao.musicmiao.utils.StringUtil;
 
 public class Song extends JavaBean {
 
@@ -82,9 +83,8 @@ public class Song extends JavaBean {
     }
 
     public String getAlbumImageUrl(){
-        String builder = "https://y.gtimg.cn/music/photo_new/T002R300x300M000" +
-                getAlbum().getMid() +
-                ".jpg";
-        return builder;
+        return  "https://y.gtimg.cn/music/photo_new/T002R300x300M000" +
+                (StringUtil.isEmpty(getAlbum().getTitle()) ? "badurl" : getAlbum().getMid())
+                + ".jpg";
     }
 }

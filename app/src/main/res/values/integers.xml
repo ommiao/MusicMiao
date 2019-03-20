@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="searchBarDuration">400</integer>
+    <integer name="search_bar_duration">400</integer>
+    <integer name="search_result_span_count">2</integer>
 </resources>

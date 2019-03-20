@@ -53,9 +53,9 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         @SuppressLint("InflateParams")
         View header = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_list_header, null);
         adapter.addHeaderView(header);
-        mBinding.rvMusic.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        mBinding.rvMusic.setLayoutManager(new StaggeredGridLayoutManager(mActivity.getResources().getInteger(R.integer.search_result_span_count), StaggeredGridLayoutManager.VERTICAL));
         mBinding.rvMusic.setAdapter(adapter);
-        mBinding.rvMusic.addItemDecoration(new StaggeredDividerItemDecoration(mActivity, 6));
+        mBinding.rvMusic.addItemDecoration(new StaggeredDividerItemDecoration(mActivity, mActivity.getResources().getDimensionPixelSize(R.dimen.music_list_item_space)));
     }
 
     @Override

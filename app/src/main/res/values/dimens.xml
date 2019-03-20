@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="tab_icon_size">22dp</dimen>
+    <dimen name="tab_icon">22dp</dimen>
+    <dimen name="music_search_title">13sp</dimen>
+    <dimen name="music_search_singer">11sp</dimen>
+    <dimen name="music_search_album">12sp</dimen>
+    <dimen name="music_list_item_space">8dp</dimen>
 </resources>

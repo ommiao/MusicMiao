@@ -11,7 +11,7 @@
                 android:valueFrom="1"
                 android:valueTo="0"
                 android:valueType="floatType"
-                android:duration="@integer/searchBarDuration"
+                android:duration="@integer/search_bar_duration"
                 android:interpolator="@android:anim/accelerate_decelerate_interpolator"/>
         </aapt:attr>
     </target>
@@ -23,7 +23,7 @@
                 android:valueFrom="0"
                 android:valueTo="1"
                 android:valueType="floatType"
-                android:duration="@integer/searchBarDuration"
+                android:duration="@integer/search_bar_duration"
                 android:interpolator="@android:anim/accelerate_decelerate_interpolator"/>
         </aapt:attr>
     </target>

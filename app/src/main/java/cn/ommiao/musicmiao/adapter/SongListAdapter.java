@@ -39,7 +39,7 @@ public class SongListAdapter extends BaseQuickAdapter<Song, BaseViewHolder> {
         String singerAndAlbum = singer + sep + album;
         int singerAndAlbumLength = singerAndAlbum.length();
         SpannableString singerAndAlbumSpan = new SpannableString(singerAndAlbum);
-        singerAndAlbumSpan.setSpan(new AbsoluteSizeSpan(13, true), singerLength + sepLength, singerAndAlbumLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        singerAndAlbumSpan.setSpan(new AbsoluteSizeSpan(mContext.getResources().getDimensionPixelSize(R.dimen.music_search_album), false), singerLength + sepLength, singerAndAlbumLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         helper.setText(R.id.tv_music_singer_album, singerAndAlbumSpan);
     }
 }
