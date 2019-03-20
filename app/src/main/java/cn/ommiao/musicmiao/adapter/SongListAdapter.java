@@ -1,6 +1,7 @@
 package cn.ommiao.musicmiao.adapter;
 
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
@@ -26,6 +27,7 @@ public class SongListAdapter extends BaseQuickAdapter<Song, BaseViewHolder> {
     protected void convert(BaseViewHolder helper, Song item) {
         SquareImageView albumView = helper.getView(R.id.siv_music_album);
         Glide.with(mContext).load(item.getAlbumImageUrl())
+                .dontTransform()
                 .placeholder(R.drawable.ic_music_s)
                 .error(R.drawable.ic_music_s)
                 .into(albumView);
@@ -41,5 +43,6 @@ public class SongListAdapter extends BaseQuickAdapter<Song, BaseViewHolder> {
         SpannableString singerAndAlbumSpan = new SpannableString(singerAndAlbum);
         singerAndAlbumSpan.setSpan(new AbsoluteSizeSpan(mContext.getResources().getDimensionPixelSize(R.dimen.music_search_album), false), singerLength + sepLength, singerAndAlbumLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         helper.setText(R.id.tv_music_singer_album, singerAndAlbumSpan);
+        ViewCompat.setTransitionName(albumView, item.getMid());
     }
 }

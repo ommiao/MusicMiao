@@ -6,4 +6,5 @@
     <dimen name="music_search_album">12sp</dimen>
     <dimen name="music_list_item_space">8dp</dimen>
     <dimen name="music_search_empty_icon">14dp</dimen>
+    <dimen name="toolbar_title">15sp</dimen>
 </resources>

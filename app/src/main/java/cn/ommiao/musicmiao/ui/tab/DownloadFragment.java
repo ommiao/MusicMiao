@@ -2,7 +2,7 @@ package cn.ommiao.musicmiao.ui.tab;
 
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.databinding.FragmentSearchBinding;
-import cn.ommiao.musicmiao.ui.BaseFragment;
+import cn.ommiao.musicmiao.ui.base.BaseFragment;
 
 public class DownloadFragment extends BaseFragment<FragmentSearchBinding> {
 

@@ -14,26 +14,12 @@
         android:background="@android:color/white"
         android:orientation="vertical">
 
-        <FrameLayout
+        <cn.ommiao.musicmiao.widget.SquareImageView
+            android:id="@+id/siv_music_album"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <cn.ommiao.musicmiao.widget.SquareImageView
-                android:id="@+id/siv_music_album"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_music_s"
-                android:tint="@color/albumGray"
-                android:foreground="@drawable/shape_music_album_foreground"/>
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/shape_music_album_mask"
-                tools:ignore="ContentDescription" />
-
-        </FrameLayout>
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_music_s"/>
 
         <TextView
             android:id="@+id/tv_music_title"
@@ -45,7 +31,6 @@
             android:ellipsize="end"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
-            android:layout_marginTop="-8dp"
             android:textColor="@color/colorPrimary"
             tools:text="明天，你好"/>
 

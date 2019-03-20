@@ -2,20 +2,15 @@ package cn.ommiao.musicmiao.ui.tab;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -24,6 +19,7 @@ import com.hanks.htextview.base.AnimationListener;
 import com.hanks.htextview.base.HTextView;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.adapter.SongListAdapter;
@@ -34,9 +30,10 @@ import cn.ommiao.musicmiao.databinding.LayoutMusicListEmptyBinding;
 import cn.ommiao.musicmiao.httpcall.musicsearch.MusicSearchCall;
 import cn.ommiao.musicmiao.httpcall.musicsearch.model.MusicSearchIn;
 import cn.ommiao.musicmiao.httpcall.musicsearch.model.MusicSearchOut;
-import cn.ommiao.musicmiao.ui.BaseFragment;
+import cn.ommiao.musicmiao.ui.base.BaseFragment;
 import cn.ommiao.musicmiao.utils.StringUtil;
 import cn.ommiao.musicmiao.utils.ToastUtil;
+import cn.ommiao.musicmiao.widget.SquareImageView;
 import cn.ommiao.network.SimpleRequestCallback;
 
 public class SearchFragment extends BaseFragment<FragmentSearchBinding> implements View.OnClickListener, AnimationListener, TextView.OnEditorActionListener {
@@ -72,8 +69,10 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         @SuppressLint("InflateParams")
         View emptyView = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_list_empty, null);
         emptyBinding = DataBindingUtil.bind(emptyView);
+        assert emptyBinding != null;
         emptyBinding.tvTips.setOnClickListener(this);
         adapter.setEmptyView(emptyView);
+        adapter.setOnItemClickListener(this::onItemClick);
     }
 
     private void initAdapterLoadMore() {
@@ -237,4 +236,21 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         imm.hideSoftInputFromWindow(mActivity.getWindow().getDecorView().getWindowToken(), 0);
     }
 
+    private void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+        SquareImageView albumView = view.findViewById(R.id.siv_music_album);
+        Song song = songs.get(position);
+        if(startDetailFragmentListener != null){
+            startDetailFragmentListener.startDetailFragment(albumView, song);
+        }
+    }
+
+    private StartDetailFragmentListener startDetailFragmentListener;
+
+    public void setStartDetailFragmentListener(StartDetailFragmentListener startDetailFragmentListener) {
+        this.startDetailFragmentListener = startDetailFragmentListener;
+    }
+
+    public interface StartDetailFragmentListener{
+        void startDetailFragment(View view, Song song);
+    }
 }

@@ -1,4 +1,4 @@
-package cn.ommiao.musicmiao.ui;
+package cn.ommiao.musicmiao.ui.base;
 
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;

@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 
-import cn.ommiao.musicmiao.ui.BaseFragment;
+import cn.ommiao.musicmiao.ui.base.BaseFragment;
 
 public class MainTabPagerAdapter extends FragmentPagerAdapter {
 
