@@ -84,7 +84,7 @@ public class Song extends JavaBean {
 
     public String getAlbumImageUrl(){
         return  "https://y.gtimg.cn/music/photo_new/T002R300x300M000" +
-                (StringUtil.isEmpty(getAlbum().getTitle()) ? "badurl" : getAlbum().getMid())
+                getAlbum().getMid()
                 + ".jpg";
     }
 }

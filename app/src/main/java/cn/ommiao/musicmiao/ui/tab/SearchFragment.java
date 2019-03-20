@@ -3,12 +3,17 @@ package cn.ommiao.musicmiao.ui.tab;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.transition.Fade;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -19,7 +24,6 @@ import com.hanks.htextview.base.AnimationListener;
 import com.hanks.htextview.base.HTextView;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.adapter.SongListAdapter;
@@ -49,12 +53,11 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
     private LayoutMusicListEmptyBinding emptyBinding;
 
     @Override
-    protected void immersionBar() {
-        ImmersionBar.with(this).titleBar(mBinding.llTitleBar).keyboardEnable(true).init();
-    }
-
-    @Override
     protected void initViews() {
+        int sHeight = ImmersionBar.getStatusBarHeight(mActivity);
+        ViewGroup.LayoutParams layoutParams = mBinding.vStatusBar.getLayoutParams();
+        layoutParams.height = sHeight;
+        mBinding.vStatusBar.setLayoutParams(layoutParams);
         mBinding.ivMusic.setOnClickListener(this);
         mBinding.ivSearch.setOnClickListener(this);
         mBinding.etSearch.setOnEditorActionListener(this);
@@ -239,9 +242,18 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
     private void onItemClick(BaseQuickAdapter adapter, View view, int position) {
         SquareImageView albumView = view.findViewById(R.id.siv_music_album);
         Song song = songs.get(position);
-        if(startDetailFragmentListener != null){
-            startDetailFragmentListener.startDetailFragment(albumView, song);
-        }
+        Bundle bundle = new Bundle();
+        MusicDetailFragment detailFragment = new MusicDetailFragment();
+        bundle.putString("url", song.getAlbumImageUrl());
+        bundle.putString("tran_name", song.getMid());
+        detailFragment.setArguments(bundle);
+        assert getFragmentManager() != null;
+        getFragmentManager()
+                .beginTransaction()
+                .addSharedElement(albumView, song.getMid())
+                .addToBackStack("detail")
+                .replace(R.id.fl_container, detailFragment)
+                .commit();
     }
 
     private StartDetailFragmentListener startDetailFragmentListener;
