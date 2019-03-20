@@ -4,11 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.transition.Fade;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -254,15 +249,5 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
                 .addToBackStack("detail")
                 .replace(R.id.fl_container, detailFragment)
                 .commit();
-    }
-
-    private StartDetailFragmentListener startDetailFragmentListener;
-
-    public void setStartDetailFragmentListener(StartDetailFragmentListener startDetailFragmentListener) {
-        this.startDetailFragmentListener = startDetailFragmentListener;
-    }
-
-    public interface StartDetailFragmentListener{
-        void startDetailFragment(View view, Song song);
     }
 }
