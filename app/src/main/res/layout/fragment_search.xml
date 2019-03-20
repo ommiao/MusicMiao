@@ -83,21 +83,6 @@
                 tools:itemCount="3"
                 tools:spanCount="2"/>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/white"
-                android:visibility="invisible">
-
-                <ProgressBar
-                    android:id="@+id/progress_bar"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_centerInParent="true"
-                    android:visibility="invisible"/>
-
-            </RelativeLayout>
-
         </FrameLayout>
 
     </LinearLayout>

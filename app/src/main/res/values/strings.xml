@@ -7,4 +7,7 @@
     <string name="search_input_keywords">请输入关键字</string>
     <string name="music_no_singer">无歌手信息</string>
     <string name="music_no_album">无专辑信息</string>
+    <string name="music_searching">正在搜索</string>
+    <string name="music_search_fail">搜索失败</string>
+    <string name="music_touch_to_search">轻触搜索</string>
 </resources>

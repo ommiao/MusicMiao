@@ -5,4 +5,5 @@
     <dimen name="music_search_singer">11sp</dimen>
     <dimen name="music_search_album">12sp</dimen>
     <dimen name="music_list_item_space">8dp</dimen>
+    <dimen name="music_search_empty_icon">14dp</dimen>
 </resources>

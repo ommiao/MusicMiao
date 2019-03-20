@@ -7,6 +7,6 @@
         android:endColor="@android:color/white"
         android:type="linear"
         android:centerColor="@color/transparentWhite"
-        android:centerY="75%"/>
+        android:centerY="78%"/>
 
 </shape>

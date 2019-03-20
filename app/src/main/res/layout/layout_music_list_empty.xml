@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_search_tips"
+                    android:layout_width="@dimen/music_search_empty_icon"
+                    android:layout_height="@dimen/music_search_empty_icon"
+                    android:src="@drawable/ic_search"
+                    android:tint="@color/colorPrimary"
+                    android:layout_marginEnd="5dp"
+                    android:visibility="visible"/>
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="@dimen/music_search_empty_icon"
+                    android:layout_height="@dimen/music_search_empty_icon"
+                    android:visibility="invisible"
+                    android:layout_marginEnd="5dp"/>
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tv_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/music_touch_to_search"
+                android:textColor="@color/colorPrimary"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</layout>

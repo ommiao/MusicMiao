@@ -2,14 +2,23 @@ package cn.ommiao.musicmiao.ui.tab;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.gyf.barlibrary.ImmersionBar;
 import com.hanks.htextview.base.AnimationListener;
 import com.hanks.htextview.base.HTextView;
@@ -21,6 +30,7 @@ import cn.ommiao.musicmiao.adapter.SongListAdapter;
 import cn.ommiao.musicmiao.adapter.StaggeredDividerItemDecoration;
 import cn.ommiao.musicmiao.bean.Song;
 import cn.ommiao.musicmiao.databinding.FragmentSearchBinding;
+import cn.ommiao.musicmiao.databinding.LayoutMusicListEmptyBinding;
 import cn.ommiao.musicmiao.httpcall.musicsearch.MusicSearchCall;
 import cn.ommiao.musicmiao.httpcall.musicsearch.model.MusicSearchIn;
 import cn.ommiao.musicmiao.httpcall.musicsearch.model.MusicSearchOut;
@@ -37,10 +47,13 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
 
     private ArrayList<Song> songs = new ArrayList<>();
     private SongListAdapter adapter;
+    private int page = 1;
+
+    private LayoutMusicListEmptyBinding emptyBinding;
 
     @Override
     protected void immersionBar() {
-        ImmersionBar.with(this).titleBar(mBinding.llTitleBar).init();
+        ImmersionBar.with(this).titleBar(mBinding.llTitleBar).keyboardEnable(true).init();
     }
 
     @Override
@@ -50,12 +63,21 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         mBinding.etSearch.setOnEditorActionListener(this);
         mBinding.stvTitle.setAnimationListener(this);
         adapter = new SongListAdapter(R.layout.item_music_search, songs);
-        @SuppressLint("InflateParams")
-        View header = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_list_header, null);
-        adapter.addHeaderView(header);
-        mBinding.rvMusic.setLayoutManager(new StaggeredGridLayoutManager(mActivity.getResources().getInteger(R.integer.search_result_span_count), StaggeredGridLayoutManager.VERTICAL));
+        adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM);
+        initAdapterLoadMore();
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(mActivity.getResources().getInteger(R.integer.search_result_span_count), StaggeredGridLayoutManager.VERTICAL);
+        mBinding.rvMusic.setLayoutManager(layoutManager);
         mBinding.rvMusic.setAdapter(adapter);
         mBinding.rvMusic.addItemDecoration(new StaggeredDividerItemDecoration(mActivity, mActivity.getResources().getDimensionPixelSize(R.dimen.music_list_item_space)));
+        @SuppressLint("InflateParams")
+        View emptyView = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_list_empty, null);
+        emptyBinding = DataBindingUtil.bind(emptyView);
+        emptyBinding.tvTips.setOnClickListener(this);
+        adapter.setEmptyView(emptyView);
+    }
+
+    private void initAdapterLoadMore() {
+        adapter.setOnLoadMoreListener(() -> search(false), mBinding.rvMusic);
     }
 
     @Override
@@ -65,18 +87,45 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.iv_music:
                 onCatClick();
                 break;
             case R.id.iv_search:
                 onSearchClick();
                 break;
+            case R.id.tv_tips:
+                onTipsClick();
+                break;
         }
     }
 
+    private void onTipsClick() {
+        if(isSearchEditViewShow){
+            keywords = mBinding.etSearch.getText().toString();
+            if (isDataChecked()) {
+                search(true);
+            }
+        } else {
+            onSearchClick();
+        }
+    }
+
+    private void onSearching(){
+        emptyBinding.tvTips.setText(getString(R.string.music_searching));
+        emptyBinding.progressBar.setVisibility(View.VISIBLE);
+        emptyBinding.ivSearchTips.setVisibility(View.INVISIBLE);
+    }
+
+    private void onSearchFail(){
+        emptyBinding.ivSearchTips.setImageResource(R.drawable.ic_search_fail);
+        emptyBinding.tvTips.setText(getString(R.string.music_search_fail));
+        emptyBinding.progressBar.setVisibility(View.INVISIBLE);
+        emptyBinding.ivSearchTips.setVisibility(View.VISIBLE);
+    }
+
     private void onCatClick() {
-        if(isSearchEditViewShow && StringUtil.isEmpty(mBinding.etSearch.getText().toString())){
+        if (isSearchEditViewShow && StringUtil.isEmpty(mBinding.etSearch.getText().toString())) {
             closeKeyboard();
             mBinding.etSearch.setText("");
             mBinding.stvTitle.setVisibility(View.VISIBLE);
@@ -86,12 +135,12 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
     }
 
     public void onSearchClick() {
-        if(!isSearchEditViewShow){
+        if (!isSearchEditViewShow) {
             toggleSearchEditView();
         }
     }
 
-    private void toggleSearchEditView(){
+    private void toggleSearchEditView() {
         isSearchEditViewShow = !isSearchEditViewShow;
         final int[] stateSet = {android.R.attr.state_checked * (isSearchEditViewShow ? 1 : -1)};
         mBinding.ivSearch.setImageState(stateSet, true);
@@ -100,7 +149,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
 
     @Override
     public void onAnimationEnd(HTextView hTextView) {
-        if(isSearchEditViewShow){
+        if (isSearchEditViewShow) {
             mBinding.stvTitle.setVisibility(View.INVISIBLE);
             mBinding.etSearch.setVisibility(View.VISIBLE);
             mBinding.etSearch.setFocusable(true);
@@ -112,9 +161,9 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if(actionId == EditorInfo.IME_ACTION_SEARCH){
+        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
             keywords = mBinding.etSearch.getText().toString();
-            if(isDataChecked()){
+            if (isDataChecked()) {
                 search(true);
             }
         }
@@ -123,41 +172,66 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
 
     private void search(final boolean clear) {
         closeKeyboard();
-        mBinding.progressBar.setVisibility(View.VISIBLE);
-        MusicSearchIn in = new MusicSearchIn(keywords, 1);
-        newCall(new MusicSearchCall(), in, new SimpleRequestCallback<MusicSearchOut>() {
-            @Override
-            public void onSuccess(MusicSearchOut out) {
-                if(clear){
-                    songs.clear();
-                }
-                songs.addAll(out.getSongs());
-                adapter.notifyDataSetChanged();
+        if(clear){
+            songs.clear();
+            adapter.notifyDataSetChanged();
+            onSearching();
+        }
+        new Thread(() -> {
+            try {
+                Thread.sleep(900);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            mActivity.runOnUiThread(() -> {
+                page = clear ? 1 : ++page;
+                MusicSearchIn in = new MusicSearchIn(keywords, page);
+                newCall(new MusicSearchCall(), in, new SimpleRequestCallback<MusicSearchOut>() {
+                    @Override
+                    public void onSuccess(MusicSearchOut out) {
+                        songs.addAll(out.getSongs());
+                        if (clear){
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            adapter.notifyItemInserted(songs.size());
+                        }
+                        int total = out.getData().getSong().getTotalnum();
+                        if (songs.size() >= total) {
+                            adapter.loadMoreEnd(true);
+                        } else {
+                            adapter.loadMoreComplete();
+                        }
+                    }
 
-            @Override
-            public void onError(String error) {
-
-            }
-        });
+                    @Override
+                    public void onError(String error) {
+                        if (!clear) {
+                            adapter.loadMoreFail();
+                        } else {
+                            onSearchFail();
+                        }
+                    }
+                });
+            });
+        }).start();
     }
 
     private boolean isDataChecked() {
-        if(StringUtil.isEmpty(keywords)){
+        if (StringUtil.isEmpty(keywords)) {
             ToastUtil.show(R.string.search_input_keywords);
             return false;
         }
         return true;
     }
 
-    private void openKeyboard(){
+    private void openKeyboard() {
         InputMethodManager imm =
                 (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
         assert imm != null;
         imm.showSoftInput(mBinding.etSearch, 0);
     }
 
-    private void closeKeyboard(){
+    private void closeKeyboard() {
         InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
         assert imm != null;
         imm.hideSoftInputFromWindow(mActivity.getWindow().getDecorView().getWindowToken(), 0);

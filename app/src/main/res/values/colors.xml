@@ -5,5 +5,5 @@
     <color name="colorAccent">#a23df8</color>
     <color name="albumGray">#EEEEEEEE</color>
     <color name="transparentWhite">#00FFFFFF</color>
-    <color name="transparentHalfWhite">#88FFFFFF</color>
+    <color name="transparentHalfWhite">#CCFFFFFF</color>
 </resources>
