@@ -2,6 +2,7 @@ package cn.ommiao.musicmiao.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
+import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -18,6 +19,7 @@ import android.util.Property;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 
 import cn.ommiao.musicmiao.R;
@@ -25,17 +27,7 @@ import cn.ommiao.musicmiao.R;
 
 public class PlayPauseView extends FrameLayout {
 
-    private static final Property<PlayPauseView, Integer> COLOR = new Property<PlayPauseView, Integer>(Integer.class, "color") {
-        @Override
-        public Integer get(PlayPauseView v) {
-            return v.getCircleColor();
-        }
 
-        @Override
-        public void set(PlayPauseView v, Integer value) {
-            v.setCircleColor(value);
-        }
-    };
 
     private static final long PLAY_PAUSE_ANIMATION_DURATION = 200;
 
@@ -44,11 +36,14 @@ public class PlayPauseView extends FrameLayout {
     private int mDrawableColor;
     public boolean isDrawCircle;
     public int circleAlpha;
+    private final Paint mProgressPaint = new Paint();
 
     private AnimatorSet mAnimatorSet;
     private int mBackgroundColor;
     private int mWidth;
     private int mHeight;
+
+    private ValueAnimator loadingAnimator;
 
     public PlayPauseView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -67,7 +62,7 @@ public class PlayPauseView extends FrameLayout {
         mPaint.setColor(mBackgroundColor);
         mDrawable = new PlayPauseDrawable(context, mDrawableColor);
         mDrawable.setCallback(this);
-
+        loading();
     }
 
     @Override
@@ -127,6 +122,8 @@ public class PlayPauseView extends FrameLayout {
         return false;
     }
 
+    private float angle = 270, sweepAngle = 90;
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -138,6 +135,40 @@ public class PlayPauseView extends FrameLayout {
             canvas.drawCircle(mWidth / 2f, mHeight / 2f, radius, mPaint);
         }
         mDrawable.draw(canvas);
+        mProgressPaint.setColor(Color.WHITE);
+        mProgressPaint.setAntiAlias(true);
+        mProgressPaint.setStrokeWidth(10f);
+        mProgressPaint.setStyle(Paint.Style.STROKE);
+        canvas.drawArc(5, 5, mWidth-5, mHeight-5, angle, sweepAngle, false, mProgressPaint);
+    }
+
+    private void loading(){
+        loadingAnimator = ValueAnimator.ofFloat(270, 270 + 360);
+        loadingAnimator.setDuration(2000);
+        loadingAnimator.setRepeatCount(10000);
+        loadingAnimator.setInterpolator(new LinearInterpolator());
+        loadingAnimator.addUpdateListener(animation -> {
+            angle = (float) animation.getAnimatedValue();
+            invalidate();
+        });
+        loadingAnimator.start();
+        postDelayed(this::loadingFinish, 3000);
+    }
+
+
+    private void loadingFinish(){
+        loadingAnimator.cancel();
+        ValueAnimator exitLoadingAnimator = ValueAnimator.ofFloat(angle, 270 + 360);
+        exitLoadingAnimator.setDuration(2000L * (long) (270 + 360 - angle) / 360L);
+        exitLoadingAnimator.setInterpolator(new LinearInterpolator());
+        exitLoadingAnimator.addUpdateListener(animation -> {
+            angle = (float) animation.getAnimatedValue();
+            if(270 + 360 - angle < 90){
+                sweepAngle = 270 + 360 - angle;
+            }
+            invalidate();
+        });
+        exitLoadingAnimator.start();
     }
 
     private boolean mIsPlay;
