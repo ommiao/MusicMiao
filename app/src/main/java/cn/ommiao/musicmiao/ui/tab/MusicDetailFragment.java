@@ -1,10 +1,13 @@
 package cn.ommiao.musicmiao.ui.tab;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.transition.TransitionInflater;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 
 import com.gyf.barlibrary.ImmersionBar;
 import com.squareup.picasso.Callback;
@@ -38,6 +41,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         tran_name = bundle.getString("tran_name");
         mBinding.playPause.pause();
         mBinding.playPause.setOnClickListener(this);
+        mBinding.btnStartProgressBar.setOnClickListener(this);
     }
 
     @Override
@@ -77,6 +81,19 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                     mBinding.playPause.play();
                 }
                 break;
+            case R.id.btn_start_progress_bar:
+                virtualProgress();
+                break;
         }
+    }
+
+    private void virtualProgress() {
+        ValueAnimator progressAnimator = ValueAnimator.ofFloat(0, 1);
+        progressAnimator.setDuration(30 * 1000L);
+        progressAnimator.setInterpolator(new LinearInterpolator());
+        progressAnimator.addUpdateListener(animation -> {
+            mBinding.playPause.setProgress((Float) animation.getAnimatedValue());
+        });
+        progressAnimator.start();
     }
 }
