@@ -14,7 +14,7 @@ import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.databinding.FragmentMusicDetailBinding;
 import cn.ommiao.musicmiao.ui.base.BaseFragment;
 
-public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding> {
+public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding> implements View.OnClickListener{
 
     private String url, tran_name;
 
@@ -36,6 +36,8 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         assert bundle != null;
         url = bundle.getString("url");
         tran_name = bundle.getString("tran_name");
+        mBinding.playPause.pause();
+        mBinding.playPause.setOnClickListener(this);
     }
 
     @Override
@@ -63,5 +65,18 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                         startPostponedEnterTransition();
                     }
                 });
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.play_pause:
+                if(mBinding.playPause.isPlay()){
+                    mBinding.playPause.pause();
+                } else {
+                    mBinding.playPause.play();
+                }
+                break;
+        }
     }
 }
