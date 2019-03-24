@@ -1,4 +1,4 @@
-package cn.ommiao.musicmiao.widget;
+package cn.ommiao.musicmiao.widget.playpause;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -26,8 +26,14 @@ import cn.ommiao.musicmiao.R;
 
 public class PlayPauseView extends FrameLayout {
 
+    private static final float LOADING_ANGLE = 90;
+    private static final float START_LOADING_ANGLE = 270;
 
-    private static final long PLAY_PAUSE_ANIMATION_DURATION = 200;
+    private static final long TRANSITION_LOADING_DURATION = 500;
+    private static final long LOADING_PER_ROUND = 2000;
+    private static final long TRANSITIOM_STOP_PROGRESS = 800;
+
+    private static final long PLAY_PAUSE_ANIMATION_DURATION = 300;
 
     private final PlayPauseDrawable mDrawable;
     private final Paint mPaint = new Paint();
@@ -41,14 +47,11 @@ public class PlayPauseView extends FrameLayout {
     private int mWidth;
     private int mHeight;
 
-    private LoadingStatus status = LoadingStatus.NO_STRAT;
-    private boolean shouldStopLoading = false;
+    private PlayStatus playStatus = PlayStatus.NONE; //初始播放状态
 
-    public enum LoadingStatus{
-        NO_STRAT, START_LOADING, LOADING, STOP_LOADING, PROGRESS, STOP_PROGRESS, PAUSE
+    private enum PlayStatus{
+        NONE, START_LOADING, LOADING, STOP_LOADING, PROGRESS, STOP_PROGRESS, PAUSE
     }
-
-    private ValueAnimator loadingAnimator;
 
     public PlayPauseView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -72,8 +75,6 @@ public class PlayPauseView extends FrameLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        // final int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
-        // setMeasuredDimension(size, size);
     }
 
     @Override
@@ -103,8 +104,8 @@ public class PlayPauseView extends FrameLayout {
         invalidate();
     }
 
-    public void setCircleAlpah(int alpah) {
-        circleAlpha = alpah;
+    public void setCircleAlpha(int alpha) {
+        circleAlpha = alpha;
         invalidate();
     }
 
@@ -126,7 +127,7 @@ public class PlayPauseView extends FrameLayout {
         return false;
     }
 
-    private float angle = 270, sweepAngle = 0;
+    private float startAngle = 270, sweepAngle = 0;
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -143,189 +144,76 @@ public class PlayPauseView extends FrameLayout {
         mProgressPaint.setAntiAlias(true);
         mProgressPaint.setStrokeWidth(10f);
         mProgressPaint.setStyle(Paint.Style.STROKE);
-        canvas.drawArc(5, 5, mWidth - 5, mHeight - 5, angle, sweepAngle, false, mProgressPaint);
+        canvas.drawArc(5, 5, mWidth - 5, mHeight - 5, startAngle, sweepAngle, false, mProgressPaint);
     }
 
-    private void startLoading() {
-        if(status != LoadingStatus.NO_STRAT){
-            return;
-        }
-        status = LoadingStatus.START_LOADING;
-        angle = 270;
-        sweepAngle = 0;
-        ValueAnimator startLoadingAnimator = ValueAnimator.ofFloat(angle, 270 + 360);
-        startLoadingAnimator.setDuration(2000L * (long) (270 + 360 - angle) / 360L);
+    private void startLoading(){
+        playStatus = PlayStatus.START_LOADING;
+        ValueAnimator startLoadingAnimator = ValueAnimator.ofFloat(0, LOADING_ANGLE);
+        startLoadingAnimator.setDuration(TRANSITION_LOADING_DURATION);
         startLoadingAnimator.setInterpolator(new LinearInterpolator());
         startLoadingAnimator.addUpdateListener(animation -> {
-            angle = (float) animation.getAnimatedValue();
-            if (angle -270 < 90) {
-                sweepAngle = angle - 270;
-            }
+            sweepAngle = (float) animation.getAnimatedValue();
             invalidate();
         });
-        startLoadingAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
+        startLoadingAnimator.addListener(new SimpleAnimatorListener(){
             @Override
             public void onAnimationEnd(Animator animation) {
-                if(shouldStopLoading){
-                    stopLoading();
-                } else {
-                    loading();
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
+                repeatLoading();
             }
         });
         startLoadingAnimator.start();
     }
 
-    private void loading(){
-        status = LoadingStatus.LOADING;
-        loadingAnimator = ValueAnimator.ofFloat(270, 270 + 360);
-        loadingAnimator.setDuration(2000);
-        loadingAnimator.setRepeatCount(100000);
+    private ValueAnimator loadingAnimator;
+
+    private void repeatLoading() {
+        playStatus = PlayStatus.LOADING;
+        loadingAnimator = ValueAnimator.ofFloat(START_LOADING_ANGLE, START_LOADING_ANGLE + 360);
+        loadingAnimator.setDuration(LOADING_PER_ROUND);
+        loadingAnimator.setRepeatCount(999999);
         loadingAnimator.setInterpolator(new LinearInterpolator());
         loadingAnimator.addUpdateListener(animation -> {
-            angle = (float) animation.getAnimatedValue();
+            startAngle = (float) animation.getAnimatedValue();
             invalidate();
         });
         loadingAnimator.start();
     }
 
-
-    private void stopLoading() {
-        if(status != LoadingStatus.LOADING){
-            return;
-        }
-        if(status == LoadingStatus.START_LOADING){
-            shouldStopLoading = true;
-            return;
-        }
-        status = LoadingStatus.STOP_LOADING;
+    private boolean shouldShowProgress = false;
+    private void stopLoading(){
+        playStatus = PlayStatus.STOP_LOADING;
         loadingAnimator.cancel();
-        ValueAnimator exitLoadingAnimator = ValueAnimator.ofFloat(angle, 270 + 360);
-        exitLoadingAnimator.setDuration(2000L * (long) (270 + 360 - angle) / 360L);
-        exitLoadingAnimator.setInterpolator(new LinearInterpolator());
-        exitLoadingAnimator.addUpdateListener(animation -> {
-            angle = (float) animation.getAnimatedValue();
-            if (270 + 360 - angle < 90) {
-                sweepAngle = 270 + 360 - angle;
+        ValueAnimator stopLoadingAnimator;
+        float stopDistance;
+        if(startAngle + LOADING_ANGLE > START_LOADING_ANGLE + 360){
+            stopDistance = START_LOADING_ANGLE + 360 * 2;
+        } else {
+            stopDistance = START_LOADING_ANGLE + 360;
+        }
+        stopLoadingAnimator = ValueAnimator.ofFloat(startAngle, stopDistance);
+        stopLoadingAnimator.setDuration(LOADING_PER_ROUND * (long) ((long)stopDistance - startAngle) / 360L);
+        stopLoadingAnimator.setInterpolator(new LinearInterpolator());
+        stopLoadingAnimator.addUpdateListener(animation -> {
+            startAngle = (float) animation.getAnimatedValue();
+            if(startAngle + LOADING_ANGLE > stopDistance){
+                sweepAngle = stopDistance - startAngle;
             }
             sweepAngle += getProgressAngle();
             invalidate();
         });
-        exitLoadingAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
+        stopLoadingAnimator.addListener(new SimpleAnimatorListener(){
             @Override
             public void onAnimationEnd(Animator animation) {
-                angle = 270;
-                sweepAngle = getProgressAngle();
-                if(shouldShowProgress){
-                    setProgress(progress);
-                    shouldShowProgress = false;
-                    status = LoadingStatus.PROGRESS;
-                } else {
-                    status = LoadingStatus.NO_STRAT;
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
+                startAngle = START_LOADING_ANGLE;
+                playStatus = shouldShowProgress ? PlayStatus.PROGRESS : PlayStatus.NONE;
             }
         });
-        exitLoadingAnimator.start();
-    }
-
-    private boolean shouldShowProgress = false;
-    private float progress = 0f;
-
-    public void setProgress(float progress){
-        this.progress = progress;
-        if(status == LoadingStatus.START_LOADING){
-            shouldShowProgress = true;
-            stopLoading();
-        } else if(status == LoadingStatus.STOP_LOADING){
-            shouldShowProgress = true;
-        } else if(status == LoadingStatus.LOADING){
-            shouldShowProgress = true;
-            stopLoading();
-        } else {
-            status = LoadingStatus.PROGRESS;
-            angle = 270;
-            sweepAngle = getProgressAngle();
-            invalidate();
-            if(sweepAngle >= 270 + 360){
-                if(isPlay()){
-                    pause();
-                }
-                stopProgress();
-            }
-        }
-    }
-
-    private void stopProgress() {
-        if(status != LoadingStatus.PROGRESS){
-            return;
-        }
-        status = LoadingStatus.STOP_PROGRESS;
-        ValueAnimator stopProgressAnimator = ValueAnimator.ofFloat(270 + 360, 270);
-        stopProgressAnimator.setDuration(800L);
-        stopProgressAnimator.setInterpolator(new LinearInterpolator());
-        stopProgressAnimator.addUpdateListener(animation -> {
-            angle = 270;
-            sweepAngle = (float) animation.getAnimatedValue();
-            invalidate();
-        });
-        stopProgressAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                angle = 270;
-                sweepAngle = 0;
-                status = LoadingStatus.NO_STRAT;
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        stopProgressAnimator.start();
+        stopLoadingAnimator.start();
     }
 
     private float getProgressAngle(){
-        return 270 + progress * 360;
+        return 360 * progress;
     }
 
     private boolean mIsPlay;
@@ -334,25 +222,53 @@ public class PlayPauseView extends FrameLayout {
         return mIsPlay;
     }
 
-    //此时为待暂停标识
     public void play() {
-        if (mAnimatorSet != null) {
-            mAnimatorSet.cancel();
+        if(isTransitionStatus()){
+            return;
         }
-        mAnimatorSet = new AnimatorSet();
-        mIsPlay = true;
-        mDrawable.setmIsPlay(mIsPlay);
-        final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
-        mAnimatorSet.setInterpolator(new DecelerateInterpolator());
-        mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
-        pausePlayAnim.start();
-        if(status != LoadingStatus.PAUSE){
-            startLoading();
+        pauseToPlay();
+    }
+
+    public void pause() {
+        if(isTransitionStatus()){
+            return;
+        }
+        playToPause();
+    }
+
+    private float progress = 0f;
+    public void setProgress(float progress){
+        this.progress = progress;
+        if(isTransitionStatus()){
+            return;
+        }
+        //playStatus = PlayStatus.PROGRESS;
+        sweepAngle = getProgressAngle();
+        invalidate();
+        if(getProgressAngle() >= 360){
+            stopProgress();
         }
     }
 
-    //此时为待播放标识
-    public void pause() {
+    private void stopProgress() {
+        playStatus = PlayStatus.STOP_PROGRESS;
+        ValueAnimator stopProgressAnimator = ValueAnimator.ofFloat(START_LOADING_ANGLE + 360, START_LOADING_ANGLE);
+        stopProgressAnimator.setDuration(TRANSITIOM_STOP_PROGRESS);
+        stopProgressAnimator.setInterpolator(new LinearInterpolator());
+        stopProgressAnimator.addUpdateListener(animation -> {
+            sweepAngle = (float) animation.getAnimatedValue();
+            invalidate();
+        });
+        stopProgressAnimator.addListener(new SimpleAnimatorListener(){
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                playStatus = PlayStatus.NONE;
+            }
+        });
+        stopProgressAnimator.start();
+    }
+
+    private void playToPause(){
         if (mAnimatorSet != null) {
             mAnimatorSet.cancel();
         }
@@ -364,9 +280,29 @@ public class PlayPauseView extends FrameLayout {
         mAnimatorSet.setInterpolator(new DecelerateInterpolator());
         mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
         pausePlayAnim.start();
-        if(status != LoadingStatus.PROGRESS){
-            stopLoading();
+    }
+
+    private void pauseToPlay(){
+        if (mAnimatorSet != null) {
+            mAnimatorSet.cancel();
         }
+        mAnimatorSet = new AnimatorSet();
+        mIsPlay = true;
+        mDrawable.setmIsPlay(mIsPlay);
+        final Animator pausePlayAnim = mDrawable.getPausePlayAnimator();
+        mAnimatorSet.setInterpolator(new DecelerateInterpolator());
+        mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
+        pausePlayAnim.start();
+    }
+
+    /**
+     * 判断是否为过渡状态，过渡状态不接受状态切换命令
+     * @return
+     */
+    private boolean isTransitionStatus(){
+        return playStatus == PlayStatus.START_LOADING ||
+                playStatus == PlayStatus.STOP_LOADING ||
+                playStatus == PlayStatus.STOP_PROGRESS;
     }
 
 }

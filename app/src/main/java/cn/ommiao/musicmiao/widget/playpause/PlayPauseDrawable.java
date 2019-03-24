@@ -27,7 +27,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package cn.ommiao.musicmiao.widget;
+package cn.ommiao.musicmiao.widget.playpause;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
