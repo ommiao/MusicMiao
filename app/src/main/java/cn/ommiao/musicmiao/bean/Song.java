@@ -1,11 +1,12 @@
 package cn.ommiao.musicmiao.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import cn.ommiao.bean.JavaBean;
 import cn.ommiao.musicmiao.utils.StringUtil;
 
-public class Song extends JavaBean {
+public class Song extends JavaBean implements Serializable {
 
     private int id;
     private String mid;

@@ -14,12 +14,18 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import cn.ommiao.musicmiao.R;
+import cn.ommiao.musicmiao.bean.Song;
 import cn.ommiao.musicmiao.databinding.FragmentMusicDetailBinding;
+import cn.ommiao.musicmiao.httpcall.lyricsquery.LyricsQueryCall;
+import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryIn;
+import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryOut;
 import cn.ommiao.musicmiao.ui.base.BaseFragment;
+import cn.ommiao.network.SimpleRequestCallback;
 
 public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding> implements View.OnClickListener{
 
-    private String url, tran_name;
+    private String tran_name;
+    private Song song;
 
     @Override
     protected void immersionBar() {
@@ -37,11 +43,27 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     protected void initViews() {
         Bundle bundle = getArguments();
         assert bundle != null;
-        url = bundle.getString("url");
+        song = (Song) bundle.getSerializable("song");
         tran_name = bundle.getString("tran_name");
         mBinding.playPause.pause();
         mBinding.playPause.setOnClickListener(this);
         mBinding.btnStartProgressBar.setOnClickListener(this);
+    }
+
+    @Override
+    protected void initData() {
+        LyricsQueryIn in = new LyricsQueryIn(song.getMid());
+        newCall(new LyricsQueryCall(), in, new SimpleRequestCallback<LyricsQueryOut>() {
+            @Override
+            public void onSuccess(LyricsQueryOut out) {
+                mBinding.tvLyrics.setText(out.getDecodeLyrics());
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
     }
 
     @Override
@@ -54,7 +76,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         super.onViewCreated(view, savedInstanceState);
         mBinding.ivAlbum.setTransitionName(tran_name);
         Picasso.with(getContext())
-                .load(url)
+                .load(song.getAlbumImageUrl())
                 .noFade()
                 .placeholder(R.drawable.ic_music_s)
                 .error(R.drawable.ic_music_s)

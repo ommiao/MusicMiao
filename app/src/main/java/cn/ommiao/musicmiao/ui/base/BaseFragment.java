@@ -38,6 +38,16 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
         return mBinding.getRoot();
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initData();
+    }
+
+    protected void initData() {
+
+    }
+
     protected void immersionBar() {
         ImmersionBar.with(this).init();
     }

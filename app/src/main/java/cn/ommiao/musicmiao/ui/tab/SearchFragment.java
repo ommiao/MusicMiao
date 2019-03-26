@@ -239,7 +239,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         Song song = songs.get(position);
         Bundle bundle = new Bundle();
         MusicDetailFragment detailFragment = new MusicDetailFragment();
-        bundle.putString("url", song.getAlbumImageUrl());
+        bundle.putSerializable("song", song);
         bundle.putString("tran_name", song.getMid());
         detailFragment.setArguments(bundle);
         assert getFragmentManager() != null;
