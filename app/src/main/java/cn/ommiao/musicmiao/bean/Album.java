@@ -1,8 +1,10 @@
 package cn.ommiao.musicmiao.bean;
 
+import java.io.Serializable;
+
 import cn.ommiao.bean.JavaBean;
 
-public class Album extends JavaBean {
+public class Album extends JavaBean implements Serializable {
 
     private int id;
     private String mid, name, title, title_hilight;

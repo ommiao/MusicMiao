@@ -1,8 +1,10 @@
 package cn.ommiao.musicmiao.bean;
 
+import java.io.Serializable;
+
 import cn.ommiao.bean.JavaBean;
 
-public class SongFile extends JavaBean {
+public class SongFile extends JavaBean implements Serializable {
 
     private String media_mid, strMediaMid;
     private int size_128, size_320, size_ape, size_flac;

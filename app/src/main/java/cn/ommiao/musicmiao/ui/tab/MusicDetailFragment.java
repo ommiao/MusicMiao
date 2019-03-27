@@ -1,11 +1,9 @@
 package cn.ommiao.musicmiao.ui.tab;
 
-import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.transition.TransitionInflater;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -56,18 +54,6 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         mBinding.toolbatLayout.setTitle(song.getTitle());
         mBinding.playPause.pause();
         mBinding.playPause.setOnClickListener(this);
-        mBinding.appBar.addOnOffsetChangedListener((appBarLayout, i) -> {
-            if(i == 0){ //展开状态
-                mBinding.scrollView.setInterceptUp(true);
-                mBinding.scrollView.setInterceptDown(false);
-            } else if(Math.abs(i) >= mBinding.appBar.getTotalScrollRange()){ //折叠状态
-                mBinding.scrollView.setInterceptUp(false);
-                mBinding.scrollView.setInterceptDown(true);
-            } else { //中间状态
-                mBinding.scrollView.setInterceptUp(true);
-                mBinding.scrollView.setInterceptDown(true);
-            }
-        });
     }
 
     @Override
