@@ -5,13 +5,20 @@ import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.transition.TransitionInflater;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 import com.gyf.barlibrary.ImmersionBar;
+import com.lauzy.freedom.library.Lrc;
+import com.lauzy.freedom.library.LrcHelper;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.bean.Song;
@@ -20,6 +27,7 @@ import cn.ommiao.musicmiao.httpcall.lyricsquery.LyricsQueryCall;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryIn;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryOut;
 import cn.ommiao.musicmiao.ui.base.BaseFragment;
+import cn.ommiao.musicmiao.utils.StringUtil;
 import cn.ommiao.network.SimpleRequestCallback;
 
 public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding> implements View.OnClickListener{
@@ -45,9 +53,21 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         assert bundle != null;
         song = (Song) bundle.getSerializable("song");
         tran_name = bundle.getString("tran_name");
+        mBinding.toolbatLayout.setTitle(song.getTitle());
         mBinding.playPause.pause();
         mBinding.playPause.setOnClickListener(this);
-        mBinding.btnStartProgressBar.setOnClickListener(this);
+        mBinding.appBar.addOnOffsetChangedListener((appBarLayout, i) -> {
+            if(i == 0){ //展开状态
+                mBinding.scrollView.setInterceptUp(true);
+                mBinding.scrollView.setInterceptDown(false);
+            } else if(Math.abs(i) >= mBinding.appBar.getTotalScrollRange()){ //折叠状态
+                mBinding.scrollView.setInterceptUp(false);
+                mBinding.scrollView.setInterceptDown(true);
+            } else { //中间状态
+                mBinding.scrollView.setInterceptUp(true);
+                mBinding.scrollView.setInterceptDown(true);
+            }
+        });
     }
 
     @Override
@@ -56,7 +76,13 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         newCall(new LyricsQueryCall(), in, new SimpleRequestCallback<LyricsQueryOut>() {
             @Override
             public void onSuccess(LyricsQueryOut out) {
-                mBinding.tvLyrics.setText(out.getDecodeLyrics());
+                boolean success = StringUtil.writeToFile(mActivity.getExternalCacheDir() + "/lyrics.lrc", out.getDecodeLyrics());
+                List<Lrc> lrcs = new ArrayList<>();
+                if(success){
+                    File lyrics = new File(mActivity.getExternalCacheDir() + "/lyrics.lrc");
+                    lrcs = LrcHelper.parseLrcFromFile(lyrics);
+                }
+                mBinding.lrcView.setLrcData(lrcs);
             }
 
             @Override
@@ -102,9 +128,6 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                 } else {
                     mBinding.playPause.play();
                 }
-                break;
-            case R.id.btn_start_progress_bar:
-                virtualProgress();
                 break;
         }
     }
