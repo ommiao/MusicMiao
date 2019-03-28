@@ -128,19 +128,19 @@ public abstract class BaseRequest<IN extends RequestInBase, OUT extends RequestO
                                 requestCallBack.onSuccess(out, res, response);
                                 break;
                             default:
-                                requestCallBack.onError(out.getMessage(), null);
+                                requestCallBack.onError(errorCode, out.getMessage(), null);
                                 break;
                         }
                     } else {
-                        requestCallBack.onError("通信异常", null);
+                        requestCallBack.onError(-9997, "通信异常", null);
                     }
 
                 } catch (Exception e) {
                     Logger.e("Exception", e);
-                    requestCallBack.onError("通信异常", e);
+                    requestCallBack.onError(-9998, "通信异常", e);
                 }
             } else {
-                requestCallBack.onError("网络错误 " + response.code(), null);
+                requestCallBack.onError(-9999, "网络错误 " + response.code(), null);
             }
         }
     }
@@ -152,7 +152,7 @@ public abstract class BaseRequest<IN extends RequestInBase, OUT extends RequestO
     private void dealError(Call<ResponseBody> call, Throwable throwable) {
         RequestCallBack<OUT> requestCallBack = callBackWeakReference.get();
         if (requestCallBack != null) {
-            requestCallBack.onError("网络错误！", throwable);
+            requestCallBack.onError(-9999, "网络错误！", throwable);
         }
     }
 

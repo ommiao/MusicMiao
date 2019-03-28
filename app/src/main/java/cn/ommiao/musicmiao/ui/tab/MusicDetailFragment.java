@@ -11,6 +11,7 @@ import android.view.animation.LinearInterpolator;
 import com.gyf.barlibrary.ImmersionBar;
 import com.lauzy.freedom.library.Lrc;
 import com.lauzy.freedom.library.LrcHelper;
+import com.orhanobut.logger.Logger;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -24,6 +25,9 @@ import cn.ommiao.musicmiao.databinding.FragmentMusicDetailBinding;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.LyricsQueryCall;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryIn;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryOut;
+import cn.ommiao.musicmiao.httpcall.vkey.VkeyCall;
+import cn.ommiao.musicmiao.httpcall.vkey.model.VkeyIn;
+import cn.ommiao.musicmiao.httpcall.vkey.model.VkeyOut;
 import cn.ommiao.musicmiao.ui.base.BaseFragment;
 import cn.ommiao.musicmiao.utils.StringUtil;
 import cn.ommiao.network.SimpleRequestCallback;
@@ -75,7 +79,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             }
 
             @Override
-            public void onError(String error) {
+            public void onError(int code, String error) {
 
             }
         });
@@ -116,9 +120,35 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                     mBinding.playPause.pause();
                 } else {
                     mBinding.playPause.play();
+                    requestVkey();
                 }
                 break;
         }
+    }
+
+    private void requestVkey() {
+        VkeyIn in = new VkeyIn();
+        newCall(new VkeyCall(), in, new SimpleRequestCallback<VkeyOut>() {
+            @Override
+            public void onSuccess(VkeyOut out) {
+                if (out.isDataValid()){
+                    Logger.d("playPath: " + generatePlayPath(out.getVkey()));
+                }
+            }
+
+            @Override
+            public void onError(int code, String error) {
+
+            }
+        });
+    }
+
+    private String generatePlayPath(String vkey){
+        return "http://streamoc.music.tc.qq.com/M500" +
+                song.getMid() +
+                ".mp3?vkey=" +
+                vkey +
+                "&guid=6422449780&uin=0&fromtag=8";
     }
 
     private void virtualProgress() {

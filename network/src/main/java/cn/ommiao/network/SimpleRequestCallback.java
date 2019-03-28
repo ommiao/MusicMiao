@@ -13,8 +13,8 @@ public abstract class SimpleRequestCallback<D extends RequestOutBase> implements
     }
 
     @Override
-    public void onError(String message, @Nullable Throwable err) {
-        onError(message);
+    public void onError(int code, String message, @Nullable Throwable err) {
+        onError(code, message);
     }
 
     @Override
@@ -24,6 +24,6 @@ public abstract class SimpleRequestCallback<D extends RequestOutBase> implements
 
     public abstract void onSuccess(D out);
 
-    public abstract void onError(String error);
+    public abstract void onError(int code, String error);
 
 }

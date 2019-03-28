@@ -23,4 +23,8 @@ public class RequestOutBase<T extends JavaBean> extends JavaBean {
     public T getData(){
         return data;
     }
+
+    public boolean isDataValid(){
+        return data != null;
+    }
 }

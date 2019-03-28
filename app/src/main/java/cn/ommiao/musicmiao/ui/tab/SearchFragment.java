@@ -201,7 +201,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
                     }
 
                     @Override
-                    public void onError(String error) {
+                    public void onError(int code, String error) {
                         if (!clear) {
                             adapter.loadMoreFail();
                         } else {

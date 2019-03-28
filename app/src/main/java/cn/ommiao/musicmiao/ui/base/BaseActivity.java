@@ -73,10 +73,10 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
             }
 
             @Override
-            public void onError(String message, @Nullable Throwable err) {
+            public void onError(int code, String message, @Nullable Throwable err) {
                 callBacks.remove(in);
                 requests.remove(url);
-                callBack.onError(message, err);
+                callBack.onError(code,  message, err);
                 hideLoading();
             }
 
