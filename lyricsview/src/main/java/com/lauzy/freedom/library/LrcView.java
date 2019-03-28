@@ -184,7 +184,7 @@ public class LrcView extends View {
         int indicatePosition = getIndicatePosition();
         mTextPaint.setTextSize(mLrcTextSize);
         mTextPaint.setTextAlign(Paint.Align.CENTER);
-        float y = getLrcHeight() / 2 - mLrcTextSize * 2 - mLrcLineSpaceHeight * 2;
+        float y = getLrcHeight() / 2;
         float x = getLrcWidth() / 2 + getPaddingLeft();
         for (int i = 0; i < getLrcCount(); i++) {
             if (i > 0) {
@@ -241,7 +241,7 @@ public class LrcView extends View {
         canvas.save();
         StaticLayout staticLayout = new StaticLayout(mDefaultContent, mTextPaint,
                 getLrcWidth(), Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
-        canvas.translate(getLrcWidth() / 2 + getPaddingLeft(), getLrcHeight() / 2 - mLrcTextSize * 2 - mLrcLineSpaceHeight * 3);
+        canvas.translate(getLrcWidth() / 2 + getPaddingLeft(), getLrcHeight() / 2);
         staticLayout.draw(canvas);
         canvas.restore();
     }

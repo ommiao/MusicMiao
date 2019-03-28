@@ -69,6 +69,9 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                     lrcs = LrcHelper.parseLrcFromFile(lyrics);
                 }
                 mBinding.lrcView.setLrcData(lrcs);
+                mBinding.lrcView.postDelayed(() -> {
+                    mBinding.appBar.setExpanded(false);
+                }, 500);
             }
 
             @Override
