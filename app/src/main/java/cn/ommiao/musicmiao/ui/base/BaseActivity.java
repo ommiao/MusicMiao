@@ -11,6 +11,7 @@ import com.gyf.barlibrary.ImmersionBar;
 
 import java.util.HashMap;
 
+import cn.ommiao.musicmiao.interfaces.OnBackPressedListener;
 import cn.ommiao.network.BaseRequest;
 import cn.ommiao.network.RequestCallBack;
 import cn.ommiao.network.RequestInBase;
@@ -28,6 +29,12 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
 
     private HashMap<RequestInBase, RequestCallBack<? extends RequestOutBase>> callBacks = new HashMap<>();
     private HashMap<String, BaseRequest<? extends RequestInBase, ? extends RequestOutBase>> requests = new HashMap<>();
+
+    private OnBackPressedListener onBackPressedListener;
+
+    public void setOnBackPressedListener(OnBackPressedListener onBackPressedListener) {
+        this.onBackPressedListener = onBackPressedListener;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,6 +54,19 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
     protected abstract void initViews();
 
     protected abstract void initData();
+
+    @Override
+    public void onBackPressed() {
+        if(onBackPressedListener != null){
+            if(onBackPressedListener.interceptBackAction()){
+                onBackPressedListener.onBackPressed();
+            } else {
+                super.onBackPressed();
+            }
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     protected void onDestroy() {

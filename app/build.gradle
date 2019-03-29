@@ -40,4 +40,5 @@ dependencies {
     implementation project(':network')
     implementation project(':logger')
     implementation project(':lyricsview')
+    implementation project(':sweetsheet')
 }

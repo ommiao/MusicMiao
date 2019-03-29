@@ -1,16 +1,22 @@
 package cn.ommiao.musicmiao.ui.tab;
 
 import android.animation.ValueAnimator;
+import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.transition.TransitionInflater;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 import com.gyf.barlibrary.ImmersionBar;
 import com.lauzy.freedom.library.Lrc;
 import com.lauzy.freedom.library.LrcHelper;
+import com.mingle.sweetpick.CustomDelegate;
+import com.mingle.sweetpick.DimEffect;
+import com.mingle.sweetpick.SweetSheet;
 import com.orhanobut.logger.Logger;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -22,6 +28,7 @@ import java.util.List;
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.bean.Song;
 import cn.ommiao.musicmiao.databinding.FragmentMusicDetailBinding;
+import cn.ommiao.musicmiao.databinding.LayoutMusicDownloadBinding;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.LyricsQueryCall;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryIn;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryOut;
@@ -36,6 +43,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
 
     private String tran_name;
     private Song song;
+    private SweetSheet mSweetSheet;
 
     @Override
     protected void immersionBar() {
@@ -58,6 +66,24 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         mBinding.toolbatLayout.setTitle(song.getTitle());
         mBinding.playPause.pause();
         mBinding.playPause.setOnClickListener(this);
+        initDownloadView();
+        mBinding.fabDownload.setOnClickListener(this);
+    }
+
+    private void initDownloadView() {
+        mSweetSheet = new SweetSheet(mBinding.flContainer);
+        CustomDelegate customDelegate = new CustomDelegate(false, CustomDelegate.AnimationType.DuangLayoutAnimation, mActivity.getResources().getDimensionPixelSize(R.dimen.music_download_height));
+        customDelegate.setCustomView(generateDownloadView());
+        customDelegate.setSweetSheetColor(Color.WHITE);
+        mSweetSheet.setDelegate(customDelegate);
+        mSweetSheet.setBackgroundEffect(new DimEffect(1));
+    }
+
+    private View generateDownloadView() {
+        View view = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_download, null);
+        LayoutMusicDownloadBinding downloadBinding = DataBindingUtil.bind(view);
+        assert downloadBinding != null;
+        return view;
     }
 
     @Override
@@ -123,6 +149,11 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                     requestVkey();
                 }
                 break;
+            case R.id.fab_download:
+                if(!mSweetSheet.isShow()){
+                    mSweetSheet.show();
+                }
+                break;
         }
     }
 
@@ -186,5 +217,17 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             mBinding.playPause.setProgress((Float) animation.getAnimatedValue());
         });
         progressAnimator.start();
+    }
+
+    @Override
+    public boolean interceptBackAction() {
+        return mSweetSheet.isShow();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mSweetSheet.isShow()){
+            mSweetSheet.dismiss();
+        }
     }
 }

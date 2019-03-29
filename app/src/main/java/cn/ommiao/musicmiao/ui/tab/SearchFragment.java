@@ -239,6 +239,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         Song song = songs.get(position);
         Bundle bundle = new Bundle();
         MusicDetailFragment detailFragment = new MusicDetailFragment();
+        mActivity.setOnBackPressedListener(detailFragment);
         bundle.putSerializable("song", song);
         bundle.putString("tran_name", song.getMid());
         detailFragment.setArguments(bundle);

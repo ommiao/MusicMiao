@@ -1,1 +1,1 @@
-include ':app', ':network', ':logger', ':lyricsview'
+include ':app', ':network', ':logger', ':lyricsview', ':sweetsheet'

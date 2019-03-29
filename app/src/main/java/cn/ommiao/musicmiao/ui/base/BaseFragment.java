@@ -13,12 +13,13 @@ import android.view.ViewGroup;
 
 import com.gyf.barlibrary.ImmersionBar;
 
+import cn.ommiao.musicmiao.interfaces.OnBackPressedListener;
 import cn.ommiao.network.BaseRequest;
 import cn.ommiao.network.RequestCallBack;
 import cn.ommiao.network.RequestInBase;
 import cn.ommiao.network.RequestOutBase;
 
-public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
+public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment implements OnBackPressedListener {
 
     protected BaseActivity mActivity;
     protected T mBinding;
@@ -72,5 +73,15 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment {
 
     protected  <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, String msg, IN in, RequestCallBack<OUT> callBack) {
         mActivity.newCall(request, showLoading, msg, in, callBack);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+    }
+
+    @Override
+    public boolean interceptBackAction() {
+        return false;
     }
 }
