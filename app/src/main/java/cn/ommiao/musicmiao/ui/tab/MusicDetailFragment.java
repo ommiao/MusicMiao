@@ -132,7 +132,11 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             @Override
             public void onSuccess(VkeyOut out) {
                 if (out.isDataValid()){
-                    Logger.d("playPath: " + generatePlayPath(out.getVkey()));
+                    generateMusicLink(out.getVkey());
+                    Logger.d("mp3 nq: " + song.getMp3NqLink());
+                    Logger.d("mp3 hq: " + song.getMp3HqLink());
+                    Logger.d("flac: " + song.getFlacLink());
+                    Logger.d("ape: " + song.getApeLink());
                 }
             }
 
@@ -143,12 +147,35 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         });
     }
 
-    private String generatePlayPath(String vkey){
-        return "http://streamoc.music.tc.qq.com/M500" +
+    private void generateMusicLink(String vkey){
+
+        String mp3NqLink = "http://streamoc.music.tc.qq.com/M500" +
                 song.getMid() +
                 ".mp3?vkey=" +
                 vkey +
-                "&guid=6422449780&uin=0&fromtag=8";
+                "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=8";
+        song.setMp3NqLink(mp3NqLink);
+
+        String mp3HqLink = "http://mobileoc.music.tc.qq.com/M800" +
+                song.getMid() +
+                ".mp3?vkey=" +
+                vkey +
+                "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=68";
+        song.setMp3HqLink(mp3HqLink);
+
+        String mp3FlacLink = "http://mobileoc.music.tc.qq.com/F000" +
+                song.getMid() +
+                ".flac?vkey=" +
+                vkey +
+                "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=63";
+        song.setFlacLink(mp3FlacLink);
+
+        String mp3ApeLink = "http://mobileoc.music.tc.qq.com/A000" +
+                song.getMid() +
+                ".ape?vkey=" +
+                vkey +
+                "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=8";
+        song.setApeLink(mp3ApeLink);
     }
 
     private void virtualProgress() {

@@ -9,7 +9,7 @@ import cn.ommiao.network.BaseRequest;
 public class VkeyCall extends BaseRequest<VkeyIn, VkeyOut> {
     @Override
     protected String api() {
-        return "base/fcgi-bin/fcg_music_express_mobile3.fcg?g_tk=556936094&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&cid=205361747&uin=0&songmid=003a1tne1nSz1Y&filename=C400003a1tne1nSz1Y.m4a&guid=6422449780";
+        return "base/fcgi-bin/fcg_music_express_mobile3.fcg?g_tk=556936094&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&cid=205361747&uin=0&songmid=003a1tne1nSz1Y&filename=C400003a1tne1nSz1Y.m4a&guid=00000000736cfed1fffffffff9ffbfd7";
     }
 
     @Override

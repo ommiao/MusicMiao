@@ -1,10 +1,13 @@
 package cn.ommiao.musicmiao.bean;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 import cn.ommiao.bean.JavaBean;
 
 public class SongFile extends JavaBean implements Serializable {
+
+    private static final String SIZE_SUFFIX = "MB";
 
     private String media_mid, strMediaMid;
     private int size_128, size_320, size_ape, size_flac;
@@ -55,5 +58,41 @@ public class SongFile extends JavaBean implements Serializable {
 
     public void setSize_flac(int size_flac) {
         this.size_flac = size_flac;
+    }
+
+    public boolean hasNqMp3(){
+        return size_128 > 0;
+    }
+
+    public String getNqMp3Size(){
+        double size = (double)size_128 / 1024.0D / 1024.0D;
+        return String.format(Locale.CHINA, "%.2f", size) + SIZE_SUFFIX;
+    }
+
+    public boolean hasHqMp3(){
+        return size_320 > 0;
+    }
+
+    public String getHqMp3Size(){
+        double size = (double)size_320 / 1024.0D / 1024.0D;
+        return String.format(Locale.CHINA, "%.2f", size) + SIZE_SUFFIX;
+    }
+
+    public boolean hasFlac(){
+        return size_flac > 0;
+    }
+
+    public String getFlacSize(){
+        double size = (double)size_flac / 1024.0D / 1024.0D;
+        return String.format(Locale.CHINA, "%.2f", size) + SIZE_SUFFIX;
+    }
+
+    public boolean hasApe(){
+        return size_ape > 0;
+    }
+
+    public String getApeSize(){
+        double size = (double)size_ape / 1024.0D / 1024.0D;
+        return String.format(Locale.CHINA, "%.2f", size) + SIZE_SUFFIX;
     }
 }

@@ -15,6 +15,8 @@ public class Song extends JavaBean implements Serializable {
     private SongFile file;
     private ArrayList<Singer> singer;
 
+    private String mp3NqLink, mp3HqLink, flacLink, apeLink;
+
     public int getId() {
         return id;
     }
@@ -87,5 +89,37 @@ public class Song extends JavaBean implements Serializable {
         return  !StringUtil.isEmpty(getAlbum().getTitle()) ?
                 "https://y.gtimg.cn/music/photo_new/T002R300x300M000" + getAlbum().getMid() + ".jpg" :
                 "http://134.175.41.67/static/ic_music_s.jpg";
+    }
+
+    public String getMp3NqLink() {
+        return mp3NqLink;
+    }
+
+    public void setMp3NqLink(String mp3NqLink) {
+        this.mp3NqLink = mp3NqLink;
+    }
+
+    public String getMp3HqLink() {
+        return mp3HqLink;
+    }
+
+    public void setMp3HqLink(String mp3HqLink) {
+        this.mp3HqLink = mp3HqLink;
+    }
+
+    public String getFlacLink() {
+        return flacLink;
+    }
+
+    public void setFlacLink(String flacLink) {
+        this.flacLink = flacLink;
+    }
+
+    public String getApeLink() {
+        return apeLink;
+    }
+
+    public void setApeLink(String apeLink) {
+        this.apeLink = apeLink;
     }
 }
