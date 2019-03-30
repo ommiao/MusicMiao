@@ -7,5 +7,10 @@
     <dimen name="music_list_item_space">8dp</dimen>
     <dimen name="music_search_empty_icon">14dp</dimen>
     <dimen name="toolbar_title">15sp</dimen>
-    <dimen name="music_download_height">170dp</dimen>
+    <dimen name="music_download_height">284dp</dimen>
+    <dimen name="music_download_title">14sp</dimen>
+    <dimen name="music_download_size">12sp</dimen>
+    <dimen name="music_download_quality">10sp</dimen>
+    <dimen name="music_download_selection_padding">12dp</dimen>
+    <dimen name="music_download_selection_height">50dp</dimen>
 </resources>

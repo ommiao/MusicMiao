@@ -6,4 +6,5 @@
     <color name="albumGray">#EEEEEEEE</color>
     <color name="transparentWhite">#00FFFFFF</color>
     <color name="transparentHalfWhite">#CCFFFFFF</color>
+    <color name="colorTextGray">@android:color/tertiary_text_light</color>
 </resources>

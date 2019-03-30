@@ -10,4 +10,12 @@
     <string name="music_searching">正在搜索</string>
     <string name="music_search_fail">搜索失败</string>
     <string name="music_touch_to_search">轻触搜索</string>
+    <string name="music_download_title">音乐下载</string>
+    <string name="music_download_mp3">MP3</string>
+    <string name="music_download_quality_normal">&#160;/ 普通</string>
+    <string name="music_download_quality_high">&#160;/ 高质量</string>
+    <string name="music_download_flac">FLAC</string>
+    <string name="music_download_quality_lossless">&#160;/ 无损</string>
+    <string name="music_download_ape">APE</string>
+    <string name="music_download_no_quality">无此音质</string>
 </resources>

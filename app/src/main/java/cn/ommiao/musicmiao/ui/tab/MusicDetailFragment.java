@@ -83,6 +83,8 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         View view = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_download, null);
         LayoutMusicDownloadBinding downloadBinding = DataBindingUtil.bind(view);
         assert downloadBinding != null;
+        downloadBinding.ivClose.setOnClickListener(this);
+        downloadBinding.setSongFile(song.getFile());
         return view;
     }
 
@@ -153,6 +155,9 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                 if(!mSweetSheet.isShow()){
                     mSweetSheet.show();
                 }
+                break;
+            case R.id.iv_close:
+                closeDownloadView();
                 break;
         }
     }
@@ -226,6 +231,10 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
 
     @Override
     public void onBackPressed() {
+        closeDownloadView();
+    }
+
+    private void closeDownloadView(){
         if(mSweetSheet.isShow()){
             mSweetSheet.dismiss();
         }
