@@ -12,7 +12,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:elevation="3dp">
+            android:background="@color/colorPrimary"
+            android:elevation="5dp">
 
             <View
                 android:id="@+id/v_status_bar"

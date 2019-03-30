@@ -1,8 +1,10 @@
 package cn.ommiao.musicmiao.ui.tab;
 
 import android.animation.ValueAnimator;
+import android.app.DownloadManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,15 +37,18 @@ import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryOut;
 import cn.ommiao.musicmiao.httpcall.vkey.VkeyCall;
 import cn.ommiao.musicmiao.httpcall.vkey.model.VkeyIn;
 import cn.ommiao.musicmiao.httpcall.vkey.model.VkeyOut;
+import cn.ommiao.musicmiao.ui.base.BaseActivity;
 import cn.ommiao.musicmiao.ui.base.BaseFragment;
 import cn.ommiao.musicmiao.utils.StringUtil;
+import cn.ommiao.musicmiao.utils.ToastUtil;
 import cn.ommiao.network.SimpleRequestCallback;
 
-public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding> implements View.OnClickListener{
+public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding> {
 
     private String tran_name;
     private Song song;
     private SweetSheet mSweetSheet;
+    private boolean downloadLinkPrepared = false;
 
     @Override
     protected void immersionBar() {
@@ -65,9 +70,10 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         tran_name = bundle.getString("tran_name");
         mBinding.toolbatLayout.setTitle(song.getTitle());
         mBinding.playPause.pause();
-        mBinding.playPause.setOnClickListener(this);
+        mBinding.playPause.setOnClickListener(v -> onPlayPauseClick());
         initDownloadView();
-        mBinding.fabDownload.setOnClickListener(this);
+        mBinding.fabDownload.setOnClickListener(v -> onDownloadClick());
+        mBinding.toolbar.setNavigationOnClickListener(v -> mActivity.onBackPressed());
     }
 
     private void initDownloadView() {
@@ -83,34 +89,19 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         View view = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_download, null);
         LayoutMusicDownloadBinding downloadBinding = DataBindingUtil.bind(view);
         assert downloadBinding != null;
-        downloadBinding.ivClose.setOnClickListener(this);
         downloadBinding.setSongFile(song.getFile());
+        downloadBinding.ivClose.setOnClickListener(v -> closeDownloadView());
+        downloadBinding.flMp3Normal.setOnClickListener(v -> onMp3NormalClick());
+        downloadBinding.flMp3High.setOnClickListener(v -> onMp3HighClick());
+        downloadBinding.flFlac.setOnClickListener(v -> onFlacClick());
+        downloadBinding.flApe.setOnClickListener(v -> onApeClick());
         return view;
     }
 
     @Override
     protected void initData() {
-        LyricsQueryIn in = new LyricsQueryIn(song.getMid());
-        newCall(new LyricsQueryCall(), in, new SimpleRequestCallback<LyricsQueryOut>() {
-            @Override
-            public void onSuccess(LyricsQueryOut out) {
-                boolean success = StringUtil.writeToFile(mActivity.getExternalCacheDir() + "/lyrics.lrc", out.getDecodeLyrics());
-                List<Lrc> lrcs = new ArrayList<>();
-                if(success){
-                    File lyrics = new File(mActivity.getExternalCacheDir() + "/lyrics.lrc");
-                    lrcs = LrcHelper.parseLrcFromFile(lyrics);
-                }
-                mBinding.lrcView.setLrcData(lrcs);
-                mBinding.lrcView.postDelayed(() -> {
-                    mBinding.appBar.setExpanded(false);
-                }, 500);
-            }
-
-            @Override
-            public void onError(int code, String error) {
-
-            }
-        });
+        requestLyrics();
+        requestVkey();
     }
 
     @Override
@@ -140,26 +131,120 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                 });
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.play_pause:
-                if(mBinding.playPause.isPlay()){
-                    mBinding.playPause.pause();
-                } else {
-                    mBinding.playPause.play();
-                    requestVkey();
-                }
-                break;
-            case R.id.fab_download:
-                if(!mSweetSheet.isShow()){
-                    mSweetSheet.show();
-                }
-                break;
-            case R.id.iv_close:
-                closeDownloadView();
-                break;
+    private void onDownloadClick() {
+        if(!mSweetSheet.isShow()){
+            mSweetSheet.show();
         }
+    }
+
+    private void onMp3NormalClick() {
+        if(!isDownloadLinkPrepared()){
+            return;
+        }
+        if(!song.getFile().hasNqMp3()){
+            ToastUtil.show(R.string.music_download_no_quality);
+            return;
+        }
+        //download start
+        downloadSong(song.getMp3NqLink(), "mp3");
+        closeDownloadViewDelay();
+    }
+
+    private void onMp3HighClick() {
+        if(!isDownloadLinkPrepared()){
+            return;
+        }
+        if(!song.getFile().hasHqMp3()){
+            ToastUtil.show(R.string.music_download_no_quality);
+            return;
+        }
+        //download start
+        downloadSong(song.getMp3HqLink(), "mp3");
+        closeDownloadViewDelay();
+    }
+
+    private void onFlacClick() {
+        if(!isDownloadLinkPrepared()){
+            return;
+        }
+        if(!song.getFile().hasFlac()){
+            ToastUtil.show(R.string.music_download_no_quality);
+            return;
+        }
+        //download start
+        downloadSong(song.getFlacLink(), "flac");
+        closeDownloadViewDelay();
+    }
+
+    private void onApeClick() {
+        if(!isDownloadLinkPrepared()){
+            return;
+        }
+        if(!song.getFile().hasApe()){
+            ToastUtil.show(R.string.music_download_no_quality);
+            return;
+        }
+        //download start
+        downloadSong(song.getApeLink(), "ape");
+        closeDownloadViewDelay();
+    }
+
+    private void downloadSong(String songUrl, String suffix){
+        String fileName = song.getTitle() + "-" + song.getOneSinger();
+        Uri uri = Uri.parse(songUrl);
+        DownloadManager manager = (DownloadManager) mActivity.getSystemService(BaseActivity.DOWNLOAD_SERVICE);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+        request.setDestinationInExternalPublicDir("Music", fileName + "." + suffix);
+        request.setVisibleInDownloadsUi(true);
+        request.allowScanningByMediaScanner();
+        request.setTitle(fileName);
+        request.setDescription(fileName);
+        manager.enqueue(request);
+        ToastUtil.show(R.string.music_download_already_add);
+    }
+
+    private boolean isDownloadLinkPrepared(){
+        if(!downloadLinkPrepared){
+            ToastUtil.show(R.string.music_link_initing);
+            return false;
+        }
+        return true;
+    }
+
+    private void onPlayPauseClick() {
+        if(!isDownloadLinkPrepared()){
+            return;
+        }
+        if(mBinding.playPause.isPlay()){
+            mBinding.playPause.pause();
+        } else {
+            mBinding.playPause.play();
+        }
+    }
+
+    private void requestLyrics(){
+        LyricsQueryIn in = new LyricsQueryIn(song.getMid());
+        newCall(new LyricsQueryCall(), in, new SimpleRequestCallback<LyricsQueryOut>() {
+            @Override
+            public void onSuccess(LyricsQueryOut out) {
+                boolean success = StringUtil.writeToFile(mActivity.getExternalCacheDir() + "/lyrics.lrc", out.getDecodeLyrics());
+                List<Lrc> lrcs = new ArrayList<>();
+                if(success){
+                    File lyrics = new File(mActivity.getExternalCacheDir() + "/lyrics.lrc");
+                    lrcs = LrcHelper.parseLrcFromFile(lyrics);
+                }
+                mBinding.lrcView.setLrcData(lrcs);
+                mBinding.lrcView.postDelayed(() -> {
+                    mBinding.appBar.setExpanded(false);
+                }, 500);
+            }
+
+            @Override
+            public void onError(int code, String error) {
+                ToastUtil.show(getString(R.string.music_lyrics_init_error) + error);
+            }
+        });
     }
 
     private void requestVkey() {
@@ -169,6 +254,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             public void onSuccess(VkeyOut out) {
                 if (out.isDataValid()){
                     generateMusicLink(out.getVkey());
+                    downloadLinkPrepared = true;
                     Logger.d("mp3 nq: " + song.getMp3NqLink());
                     Logger.d("mp3 hq: " + song.getMp3HqLink());
                     Logger.d("flac: " + song.getFlacLink());
@@ -178,7 +264,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
 
             @Override
             public void onError(int code, String error) {
-
+                ToastUtil.show(getString(R.string.music_download_init_error) + error);
             }
         });
     }
@@ -237,6 +323,21 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     private void closeDownloadView(){
         if(mSweetSheet.isShow()){
             mSweetSheet.dismiss();
+        }
+    }
+
+    private void closeDownloadViewDelay(){
+        if(mSweetSheet.isShow()){
+            new Thread(() -> {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mActivity.runOnUiThread(() -> {
+                    closeDownloadView();
+                });
+            }).start();
         }
     }
 }

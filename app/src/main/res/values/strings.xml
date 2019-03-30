@@ -17,5 +17,10 @@
     <string name="music_download_flac">FLAC</string>
     <string name="music_download_quality_lossless">&#160;/ 无损</string>
     <string name="music_download_ape">APE</string>
-    <string name="music_download_no_quality">无此音质</string>
+    <string name="music_download_no_quality">无此音质！</string>
+    <string name="music_download_init_error">初始化下载链接失败，错误信息：</string>
+    <string name="music_lyrics_init_error">获取歌词失败：</string>
+    <string name="music_link_initing">歌曲链接正在初始化，请稍候重试！</string>
+    <string name="music_downloading">正在下载</string>
+    <string name="music_download_already_add">已添加到下载管理</string>
 </resources>
