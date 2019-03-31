@@ -24,6 +24,8 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment i
     protected BaseActivity mActivity;
     protected T mBinding;
 
+    private boolean needInitData = true;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,16 +35,23 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment i
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false);
-        immersionBar();
-        initViews();
+        if(mBinding != null){
+            needInitData = false;
+        } else {
+            mBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false);
+            immersionBar();
+            initViews();
+            needInitData = true;
+        }
         return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initData();
+        if(needInitData){
+            initData();
+        }
     }
 
     protected void initData() {

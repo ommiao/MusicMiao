@@ -12,6 +12,8 @@ public class SongFile extends JavaBean implements Serializable {
     private String media_mid, strMediaMid;
     private int size_128, size_320, size_ape, size_flac;
 
+    private boolean hasLocalNqMp3 = false, hasLocalHqMp3 = false, hasLocalFlac = false, hasLocalApe = false;
+
     public String getMedia_mid() {
         return media_mid;
     }
@@ -94,5 +96,37 @@ public class SongFile extends JavaBean implements Serializable {
     public String getApeSize(){
         double size = (double)size_ape / 1024.0D / 1024.0D;
         return String.format(Locale.CHINA, "%.2f", size) + SIZE_SUFFIX;
+    }
+
+    public boolean isHasLocalNqMp3() {
+        return hasLocalNqMp3;
+    }
+
+    public void setHasLocalNqMp3(boolean hasLocalNqMp3) {
+        this.hasLocalNqMp3 = hasLocalNqMp3;
+    }
+
+    public boolean isHasLocalHqMp3() {
+        return hasLocalHqMp3;
+    }
+
+    public void setHasLocalHqMp3(boolean hasLocalHqMp3) {
+        this.hasLocalHqMp3 = hasLocalHqMp3;
+    }
+
+    public boolean isHasLocalFlac() {
+        return hasLocalFlac;
+    }
+
+    public void setHasLocalFlac(boolean hasLocalFlac) {
+        this.hasLocalFlac = hasLocalFlac;
+    }
+
+    public boolean isHasLocalApe() {
+        return hasLocalApe;
+    }
+
+    public void setHasLocalApe(boolean hasLocalApe) {
+        this.hasLocalApe = hasLocalApe;
     }
 }

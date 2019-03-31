@@ -2,7 +2,7 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.tab.MainActivity">
+    tools:context=".ui.music.MainActivity">
 
     <FrameLayout
         android:id="@+id/fl_container"

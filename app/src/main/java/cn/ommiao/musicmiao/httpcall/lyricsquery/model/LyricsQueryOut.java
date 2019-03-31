@@ -10,7 +10,8 @@ public class LyricsQueryOut extends RequestOutBase {
 
     private static final HashMap<String, String> replaceMap = new HashMap<String, String>(){
         {
-            put("&apos;", "\'");
+            put("&apos;", "'");
+            put("&amp;", "&");
         }
     };
 

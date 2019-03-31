@@ -1,13 +1,17 @@
-package cn.ommiao.musicmiao.ui.tab;
+package cn.ommiao.musicmiao.ui.music;
 
+import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.DownloadManager;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,10 +49,21 @@ import cn.ommiao.network.SimpleRequestCallback;
 
 public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding> {
 
+    private static final String SUFFIX_MP3_NQ = "-NQ.mp3";
+    private static final String SUFFIX_MP3_HQ = "-HQ.mp3";
+    private static final String SUFFIX_FLAC = ".flac";
+    private static final String SUFFIX_APE = ".ape";
+
+    private String downloadDir;
+
     private String tran_name;
     private Song song;
     private SweetSheet mSweetSheet;
     private boolean downloadLinkPrepared = false;
+    private String fileName;
+    private LayoutMusicDownloadBinding downloadBinding;
+
+    private String downloadResult;
 
     @Override
     protected void immersionBar() {
@@ -87,7 +102,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
 
     private View generateDownloadView() {
         View view = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_download, null);
-        LayoutMusicDownloadBinding downloadBinding = DataBindingUtil.bind(view);
+        downloadBinding = DataBindingUtil.bind(view);
         assert downloadBinding != null;
         downloadBinding.setSongFile(song.getFile());
         downloadBinding.ivClose.setOnClickListener(v -> closeDownloadView());
@@ -102,6 +117,16 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     protected void initData() {
         requestLyrics();
         requestVkey();
+    }
+
+    private void initLocalFileStatus() {
+        downloadDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Music";
+        fileName = song.getTitle() + "-" + song.getOneSinger();
+        String commonPath = downloadDir + "/" + fileName;
+        song.getFile().setHasLocalNqMp3(new File( commonPath + "-NQ" + ".mp3").exists());
+        song.getFile().setHasLocalHqMp3(new File( commonPath + "-HQ" + ".mp3").exists());
+        song.getFile().setHasLocalFlac(new File( commonPath + ".flac").exists());
+        song.getFile().setHasLocalApe(new File( commonPath + ".ape").exists());
     }
 
     @Override
@@ -132,9 +157,24 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     }
 
     private void onDownloadClick() {
+        initLocalFileStatus();
+        if(ContextCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            showNoPermissionTip();
+            return;
+        }
         if(!mSweetSheet.isShow()){
             mSweetSheet.show();
         }
+    }
+
+    private void showNoPermissionTip(){
+        CustomDialogFragment customDialogFragment = new CustomDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("content", getString(R.string.music_download_no_permission_tips));
+        bundle.putBoolean("justConfirm", true);
+        customDialogFragment.setArguments(bundle);
+        customDialogFragment.setOnClickActionListener(null);
+        customDialogFragment.show(mActivity.getSupportFragmentManager(), CustomDialogFragment.class.getSimpleName());
     }
 
     private void onMp3NormalClick() {
@@ -146,7 +186,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             return;
         }
         //download start
-        downloadSong(song.getMp3NqLink(), "mp3");
+        downloadSong(song.getMp3NqLink(), SUFFIX_MP3_NQ);
         closeDownloadViewDelay();
     }
 
@@ -159,7 +199,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             return;
         }
         //download start
-        downloadSong(song.getMp3HqLink(), "mp3");
+        downloadSong(song.getMp3HqLink(), SUFFIX_MP3_HQ);
         closeDownloadViewDelay();
     }
 
@@ -172,7 +212,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             return;
         }
         //download start
-        downloadSong(song.getFlacLink(), "flac");
+        downloadSong(song.getFlacLink(), SUFFIX_FLAC);
         closeDownloadViewDelay();
     }
 
@@ -185,23 +225,42 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             return;
         }
         //download start
-        downloadSong(song.getApeLink(), "ape");
+        downloadSong(song.getApeLink(), SUFFIX_APE);
         closeDownloadViewDelay();
     }
 
     private void downloadSong(String songUrl, String suffix){
-        String fileName = song.getTitle() + "-" + song.getOneSinger();
         Uri uri = Uri.parse(songUrl);
         DownloadManager manager = (DownloadManager) mActivity.getSystemService(BaseActivity.DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(uri);
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
-        request.setDestinationInExternalPublicDir("Music", fileName + "." + suffix);
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+        request.setDestinationInExternalPublicDir("Music", fileName + suffix);
         request.setVisibleInDownloadsUi(true);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.allowScanningByMediaScanner();
         request.setTitle(fileName);
         request.setDescription(fileName);
-        manager.enqueue(request);
-        ToastUtil.show(R.string.music_download_already_add);
+        try {
+            manager.enqueue(request);
+            downloadResult = getString(R.string.music_download_already_add);
+            switch (suffix){
+                case SUFFIX_MP3_NQ:
+                    song.getFile().setHasLocalNqMp3(true);
+                    break;
+                case SUFFIX_MP3_HQ:
+                    song.getFile().setHasLocalHqMp3(true);
+                    break;
+                case SUFFIX_FLAC:
+                    song.getFile().setHasLocalFlac(true);
+                    break;
+                case SUFFIX_APE:
+                    song.getFile().setHasLocalApe(true);
+                    break;
+            }
+            downloadBinding.setSongFile(song.getFile());
+        } catch (Exception e){
+            downloadResult = getString(R.string.music_download_add_fail);
+        }
     }
 
     private boolean isDownloadLinkPrepared(){
@@ -242,7 +301,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
 
             @Override
             public void onError(int code, String error) {
-                ToastUtil.show(getString(R.string.music_lyrics_init_error) + error);
+                //ToastUtil.show(getString(R.string.music_lyrics_init_error) + error);
             }
         });
     }
@@ -336,6 +395,9 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                 }
                 mActivity.runOnUiThread(() -> {
                     closeDownloadView();
+                    mBinding.getRoot().postDelayed(() -> {
+                        ToastUtil.show(downloadResult);
+                    }, 500);
                 });
             }).start();
         }

@@ -1,4 +1,4 @@
-package cn.ommiao.musicmiao.ui.tab;
+package cn.ommiao.musicmiao.ui.music;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

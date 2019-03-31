@@ -80,6 +80,14 @@
                     android:fontFamily="@font/graydesign"
                     android:textSize="@dimen/music_download_size"/>
 
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:src="@drawable/ic_round"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="center"
+                    android:tint="@{songFile.hasLocalNqMp3 ? @color/colorPrimary : @color/colorTextGray}"/>
+
             </LinearLayout>
 
         </FrameLayout>
@@ -126,6 +134,14 @@
                     android:text="@{songFile.hqMp3Size}"
                     android:fontFamily="@font/graydesign"
                     android:textSize="@dimen/music_download_size"/>
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:src="@drawable/ic_round"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="center"
+                    android:tint="@{songFile.hasLocalHqMp3 ? @color/colorPrimary : @color/colorTextGray}"/>
 
             </LinearLayout>
 
@@ -174,6 +190,14 @@
                     android:fontFamily="@font/graydesign"
                     android:textSize="@dimen/music_download_size"/>
 
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:src="@drawable/ic_round"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="center"
+                    android:tint="@{songFile.hasLocalFlac ? @color/colorPrimary : @color/colorTextGray}"/>
+
             </LinearLayout>
 
         </FrameLayout>
@@ -220,6 +244,14 @@
                     android:text="@{songFile.apeSize}"
                     android:fontFamily="@font/graydesign"
                     android:textSize="@dimen/music_download_size"/>
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:src="@drawable/ic_round"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="center"
+                    android:tint="@{songFile.hasLocalApe ? @color/colorPrimary : @color/colorTextGray}"/>
 
             </LinearLayout>
 

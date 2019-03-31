@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/exit_dialog_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dialog_margin"
+        android:layout_marginEnd="@dimen/dialog_margin"
+        app:cardCornerRadius="5dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp">
+
+            <ImageView
+                android:id="@+id/iv_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_dialog_tips"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_toEndOf="@+id/iv_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/music_download_tips"
+                android:textColor="@android:color/black"
+                android:textSize="17sp"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:id="@+id/tips_content"
+                android:layout_below="@+id/iv_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                tools:text="@string/music_download_permission_tips"
+                android:textSize="15sp"/>
+
+            <Button
+                android:id="@+id/btn_left"
+                android:layout_below="@id/tips_content"
+                android:layout_toStartOf="@+id/btn_right"
+                android:layout_width="50dp"
+                android:layout_height="22dp"
+                android:background="@android:color/transparent"
+                android:text="@string/confirm"
+                android:textColor="@color/colorPrimary"/>
+
+            <Button
+                android:id="@+id/btn_right"
+                android:layout_below="@id/tips_content"
+                android:layout_alignParentEnd="true"
+                android:layout_width="50dp"
+                android:layout_height="22dp"
+                android:background="@android:color/transparent"
+                android:text="@string/cancel"
+                android:textColor="@android:color/black"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</layout>
