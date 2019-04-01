@@ -73,7 +73,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     private MediaPlayer mediaPlayer;
     private Handler handler = new Handler();
     private WifiManager.WifiLock wifiLock;
-    private Runnable prgressRunnable;
+    private Runnable progressRunnable;
 
     @Override
     protected void immersionBar() {
@@ -300,6 +300,9 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                 mediaPlayer.setDataSource(song.getMp3NqLink());
                 mediaPlayer.setLooping(false);
                 mediaPlayer.setWakeMode(mActivity, PowerManager.PARTIAL_WAKE_LOCK);
+                if(wifiLock != null){
+                    wifiLock.release();
+                }
                 wifiLock = ((WifiManager)mActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "wifilock");
                 wifiLock.acquire();
                 mediaPlayer.prepareAsync();
@@ -309,11 +312,11 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                 });
                 mediaPlayer.setOnCompletionListener(mp -> {
                     mBinding.playPause.setProgress(1f);
-                    mBinding.lrcView.updateTime(0L);
+                    mediaPlayer.seekTo(0);
+                    mediaPlayer.pause();
                 });
                 mediaPlayer.setOnErrorListener((mp, what, extra) -> {
-                    ToastUtil.show(R.string.music_play_fail);
-                    mBinding.playPause.pause();
+                    playError();
                     return true;
                 });
             } catch (IOException e) {
@@ -324,18 +327,29 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         }
     }
 
+    private void playError(){
+        handler.removeCallbacks(progressRunnable);
+        ToastUtil.show(R.string.music_play_fail);
+        mBinding.playPause.error();
+        mBinding.lrcView.updateTime(0);
+        mediaPlayer = null;
+    }
+
     private void startProgressRunable() {
-        prgressRunnable = new Runnable() {
+        handler.removeCallbacks(progressRunnable);
+        progressRunnable = new Runnable() {
             @Override
             public void run() {
-                int currentPosition = mediaPlayer.getCurrentPosition();
-                mBinding.lrcView.updateTime(currentPosition);
-                float progress = (float) mediaPlayer.getCurrentPosition() / (float)mediaPlayer.getDuration();
-                mBinding.playPause.setProgress(progress);
-                handler.postDelayed(this, 100);
+                if(mediaPlayer != null){
+                    int currentPosition = mediaPlayer.getCurrentPosition();
+                    mBinding.lrcView.updateTime(currentPosition);
+                    float progress = (float) mediaPlayer.getCurrentPosition() / (float)mediaPlayer.getDuration();
+                    mBinding.playPause.setProgress(progress);
+                    handler.postDelayed(this, 100);
+                }
             }
         };
-        handler.post(prgressRunnable);
+        handler.post(progressRunnable);
     }
 
     private void pauseMusic() {
@@ -474,7 +488,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         if(wifiLock != null){
             wifiLock.release();
         }
-        handler.removeCallbacks(prgressRunnable);
+        handler.removeCallbacks(progressRunnable);
         super.onDestroyView();
     }
 }

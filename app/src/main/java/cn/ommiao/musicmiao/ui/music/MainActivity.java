@@ -26,7 +26,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
         SearchFragment searchFragment = new SearchFragment();
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fl_container, searchFragment)
+                .replace(R.id.fl_container, searchFragment)
                 .commit();
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             requestPermission();

@@ -247,6 +247,13 @@ public class PlayPauseView extends FrameLayout {
         }
     }
 
+    public void error(){
+        if(isTransitionStatus()){
+            return;
+        }
+        stopProgress();
+    }
+
     private float progress = 0f;
     public void setProgress(float progress){
         if(playStatus == PlayStatus.NONE){
@@ -271,7 +278,7 @@ public class PlayPauseView extends FrameLayout {
     private void stopProgress() {
         playStatus = PlayStatus.STOP_PROGRESS;
         ValueAnimator stopProgressAnimator = ValueAnimator.ofFloat(sweepAngle, 0);
-        stopProgressAnimator.setDuration(TRANSITIOM_STOP_PROGRESS);
+        stopProgressAnimator.setDuration((long) (TRANSITIOM_STOP_PROGRESS * progress));
         stopProgressAnimator.setInterpolator(new LinearInterpolator());
         stopProgressAnimator.addUpdateListener(animation -> {
             sweepAngle = (float) animation.getAnimatedValue();
