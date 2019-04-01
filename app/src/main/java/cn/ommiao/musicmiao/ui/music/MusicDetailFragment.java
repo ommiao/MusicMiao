@@ -1,7 +1,6 @@
 package cn.ommiao.musicmiao.ui.music;
 
 import android.Manifest;
-import android.animation.ValueAnimator;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -20,7 +19,6 @@ import android.support.v4.content.ContextCompat;
 import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 
 import com.gyf.barlibrary.ImmersionBar;
 import com.lauzy.freedom.library.Lrc;
@@ -434,16 +432,6 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                 vkey +
                 "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=8";
         song.setApeLink(mp3ApeLink);
-    }
-
-    private void virtualProgress() {
-        ValueAnimator progressAnimator = ValueAnimator.ofFloat(0, 1);
-        progressAnimator.setDuration(30 * 1000L);
-        progressAnimator.setInterpolator(new LinearInterpolator());
-        progressAnimator.addUpdateListener(animation -> {
-            mBinding.playPause.setProgress((Float) animation.getAnimatedValue());
-        });
-        progressAnimator.start();
     }
 
     @Override
