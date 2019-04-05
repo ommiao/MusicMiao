@@ -30,4 +30,6 @@
     <string name="music_download_no_permission_tips">检测到App无法读写存储空间，请授予App读写存储权限后重试。</string>
     <string name="music_download_add_fail">添加下载失败</string>
     <string name="music_play_fail">音乐播放失败</string>
+    <string name="music_lyrics_loading">加载歌词中...</string>
+    <string name="music_lyrics_none">暂无歌词</string>
 </resources>

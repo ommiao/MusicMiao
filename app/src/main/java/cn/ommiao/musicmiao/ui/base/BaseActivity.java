@@ -71,6 +71,8 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        callBacks.clear();
+        requests.clear();
         ImmersionBar.with(this).destroy();
     }
 

@@ -97,6 +97,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         initDownloadView();
         mBinding.fabDownload.setOnClickListener(v -> onDownloadClick());
         mBinding.toolbar.setNavigationOnClickListener(v -> mActivity.onBackPressed());
+        mBinding.lrcView.setEmptyContent(getString(R.string.music_lyrics_loading));
     }
 
     private void initDownloadView() {
@@ -370,13 +371,15 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                 }
                 mBinding.lrcView.setLrcData(lrcs);
                 mBinding.lrcView.postDelayed(() -> {
-                    mBinding.appBar.setExpanded(false);
+                    if(isAdded()){
+                        mBinding.appBar.setExpanded(false);
+                    }
                 }, 500);
             }
 
             @Override
             public void onError(int code, String error) {
-                //ToastUtil.show(getString(R.string.music_lyrics_init_error) + error);
+                mBinding.lrcView.setEmptyContent(getString(R.string.music_lyrics_none));
             }
         });
     }
@@ -406,28 +409,28 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     private void generateMusicLink(String vkey) {
 
         String mp3NqLink = "http://streamoc.music.tc.qq.com/M500" +
-                song.getMid() +
+                song.getFile().getStrMediaMid() +
                 ".mp3?vkey=" +
                 vkey +
                 "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=8";
         song.setMp3NqLink(mp3NqLink);
 
         String mp3HqLink = "http://mobileoc.music.tc.qq.com/M800" +
-                song.getMid() +
+                song.getFile().getStrMediaMid() +
                 ".mp3?vkey=" +
                 vkey +
                 "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=68";
         song.setMp3HqLink(mp3HqLink);
 
         String mp3FlacLink = "http://mobileoc.music.tc.qq.com/F000" +
-                song.getMid() +
+                song.getFile().getStrMediaMid() +
                 ".flac?vkey=" +
                 vkey +
                 "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=63";
         song.setFlacLink(mp3FlacLink);
 
         String mp3ApeLink = "http://mobileoc.music.tc.qq.com/A000" +
-                song.getMid() +
+                song.getFile().getStrMediaMid() +
                 ".ape?vkey=" +
                 vkey +
                 "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=8";

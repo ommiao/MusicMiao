@@ -171,7 +171,6 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         closeKeyboard();
         if(clear){
             songs.clear();
-            adapter.notifyDataSetChanged();
             onSearching();
         }
         new Thread(() -> {

@@ -28,8 +28,8 @@ public class LrcHelper {
 
     private static final String CHARSET = "utf-8";
     //[03:56.00][03:18.00][02:06.00][01:07.00]原谅我这一生不羁放纵爱自由
-    private static final String LINE_REGEX = "((\\[\\d{2}:\\d{2}\\.\\d{2}])+)(.*)";
-    private static final String TIME_REGEX = "\\[(\\d{2}):(\\d{2})\\.(\\d{2})]";
+    private static final String LINE_REGEX = "((\\[\\d{2}:\\d{2}[.:]\\d{2}])+)(.*)";
+    private static final String TIME_REGEX = "\\[(\\d{2}):(\\d{2})[.:](\\d{2})]";
 
     public static List<Lrc> parseLrcFromAssets(Context context, String fileName) {
         try {
