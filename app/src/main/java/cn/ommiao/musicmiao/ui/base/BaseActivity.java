@@ -23,7 +23,6 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
 
     protected T mBinding;
 
-    private static final long DEFAULT_TIP_DURATION = 2000;
     public static final boolean LOADING = true;
     public static final boolean NO_LOADING = false;
 
@@ -71,9 +70,15 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        callBacks.clear();
-        requests.clear();
+        clearRequest();
         ImmersionBar.with(this).destroy();
+    }
+
+    private void clearRequest() {
+        callBacks.clear();
+        for(BaseRequest request : requests.values()){
+            request.cancel();
+        }
     }
 
     protected void showLoading(String msg){

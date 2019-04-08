@@ -13,13 +13,23 @@ import android.view.ViewGroup;
 
 import com.gyf.barlibrary.ImmersionBar;
 
+import java.util.HashMap;
+
 import cn.ommiao.musicmiao.interfaces.OnBackPressedListener;
 import cn.ommiao.network.BaseRequest;
 import cn.ommiao.network.RequestCallBack;
 import cn.ommiao.network.RequestInBase;
 import cn.ommiao.network.RequestOutBase;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 
 public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment implements OnBackPressedListener {
+
+    public static final boolean LOADING = true;
+    public static final boolean NO_LOADING = false;
+
+    private HashMap<RequestInBase, RequestCallBack<? extends RequestOutBase>> callBacks = new HashMap<>();
+    private HashMap<String, BaseRequest<? extends RequestInBase, ? extends RequestOutBase>> requests = new HashMap<>();
 
     protected BaseActivity mActivity;
     protected T mBinding;
@@ -69,19 +79,78 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment i
     @Override
     public void onDestroy() {
         super.onDestroy();
+        clearRequest();
         ImmersionBar.with(this).destroy();
     }
 
+    private void clearRequest() {
+        callBacks.clear();
+        for(BaseRequest request : requests.values()){
+            request.cancel();
+        }
+    }
+
+    private <OUT extends RequestOutBase> RequestCallBack<OUT> arrangeCallback(final String url, final RequestInBase in, final RequestCallBack<OUT> callBack) {
+        RequestCallBack<OUT> temp = new RequestCallBack<OUT>() {
+            @Override
+            public void onSuccess(OUT result, String str, Response<ResponseBody> res) {
+                callBacks.remove(in);
+                requests.remove(url);
+                callBack.onSuccess(result, str, res);
+                hideLoading();
+            }
+
+            @Override
+            public void onError(int code, String message, @Nullable Throwable err) {
+                callBacks.remove(in);
+                requests.remove(url);
+                callBack.onError(code,  message, err);
+                hideLoading();
+            }
+
+            @Override
+            public void onCancel() {
+                callBacks.remove(in);
+                requests.remove(url);
+                callBack.onCancel();
+                hideLoading();
+            }
+        };
+        callBacks.put(in, temp);
+        return temp;
+    }
+
+    private void hideLoading() {
+
+    }
+
     protected <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, IN in, RequestCallBack<OUT> callBack) {
-        mActivity.newCall(request, in, callBack);
+        newCall(request, NO_LOADING, null, in, callBack);
     }
 
     protected <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, IN in, RequestCallBack<OUT> callBack) {
-        mActivity.newCall(request, showLoading, in, callBack);
+        newCall(request, showLoading, null, in, callBack);
     }
 
     protected  <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, String msg, IN in, RequestCallBack<OUT> callBack) {
-        mActivity.newCall(request, showLoading, msg, in, callBack);
+        if(showLoading){
+            showLoading(msg);
+        }
+        request.params(in).build(arrangeCallback(request.getUrl(), in, callBack));
+        BaseRequest old = requests.put(request.getUrl(), request.call());
+        if (old != null) {
+            RequestCallBack oldCallback = callBacks.remove(old.getParam());
+            if (oldCallback != null) {
+                //won't receive http callback.
+                old.clearCallback();
+                //send cancel callback.
+                oldCallback.onCancel();
+            }
+        }
+    }
+
+    private void showLoading(String msg) {
+
     }
 
     @Override
