@@ -47,7 +47,7 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation project(':network')
-    implementation project(':logger')
     implementation project(':lyricsview')
     implementation project(':sweetsheet')
+    implementation project(':logger')
 }
