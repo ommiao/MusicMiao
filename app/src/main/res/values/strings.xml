@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">Music Miao</string>
+    <string name="app_name">喵了音乐</string>
     <string name="tab_search">搜索</string>
     <string name="tab_download">下载</string>
-    <string name="search_title">Music Miao</string>
+    <string name="search_title">Miaole Music</string>
     <string name="search_hint">Keywords</string>
     <string name="search_input_keywords">请输入关键字</string>
     <string name="music_no_singer">无歌手信息</string>
