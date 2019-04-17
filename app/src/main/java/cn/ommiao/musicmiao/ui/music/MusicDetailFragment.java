@@ -58,8 +58,6 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     private static final String SUFFIX_FLAC = ".flac";
     private static final String SUFFIX_APE = ".ape";
 
-    private String downloadDir;
-
     private String tran_name;
     private Song song;
     private SweetSheet mSweetSheet;
@@ -129,13 +127,14 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     }
 
     private void initLocalFileStatus() {
-        downloadDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Music";
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).mkdir();
+        String downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath();
         fileName = song.getTitle() + "-" + song.getOneSinger();
         String commonPath = downloadDir + "/" + fileName;
-        song.getFile().setHasLocalNqMp3(new File(commonPath + "-NQ" + ".mp3").exists());
-        song.getFile().setHasLocalHqMp3(new File(commonPath + "-HQ" + ".mp3").exists());
-        song.getFile().setHasLocalFlac(new File(commonPath + ".flac").exists());
-        song.getFile().setHasLocalApe(new File(commonPath + ".ape").exists());
+        song.getFile().setHasLocalNqMp3(new File(commonPath + SUFFIX_MP3_NQ).exists());
+        song.getFile().setHasLocalHqMp3(new File(commonPath + SUFFIX_MP3_HQ).exists());
+        song.getFile().setHasLocalFlac(new File(commonPath + SUFFIX_FLAC).exists());
+        song.getFile().setHasLocalApe(new File(commonPath + SUFFIX_APE).exists());
     }
 
     @Override
@@ -243,7 +242,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         DownloadManager manager = (DownloadManager) mActivity.getSystemService(BaseActivity.DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-        request.setDestinationInExternalPublicDir("Music", fileName + suffix);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, fileName + suffix);
         request.setVisibleInDownloadsUi(true);
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.allowScanningByMediaScanner();
