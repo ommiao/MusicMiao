@@ -8,7 +8,7 @@ public class LocalSong extends JavaBean {
 
     private int duration;
 
-    private long id, albumId, size;
+    private long id, size;
 
     public long getId() {
         return id;
@@ -16,14 +16,6 @@ public class LocalSong extends JavaBean {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public long getAlbumId() {
-        return albumId;
-    }
-
-    public void setAlbumId(long albumId) {
-        this.albumId = albumId;
     }
 
     public String getTitle() {

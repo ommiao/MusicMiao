@@ -48,6 +48,9 @@ public class LocalMusicFragment extends BaseFragment<FragmentLocalMusicBinding> 
     @Override
     protected void initData() {
         ArrayList<LocalSong> songs = MusicUtil.getMusicData(mActivity);
+        for(LocalSong song : songs){
+            Logger.d(song.toHashMap());
+        }
         localSongs.addAll(songs);
         adapter.notifyDataSetChanged();
     }

@@ -1,6 +1,5 @@
 package cn.ommiao.musicmiao.adapter;
 
-import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableString;
@@ -10,14 +9,11 @@ import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
-import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.List;
 
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.bean.LocalSong;
-import cn.ommiao.musicmiao.utils.MusicUtil;
 import cn.ommiao.musicmiao.utils.StringUtil;
 import cn.ommiao.musicmiao.widget.SquareImageView;
 
@@ -30,15 +26,10 @@ public class LocalSongListAdapter extends BaseQuickAdapter<LocalSong, BaseViewHo
     @Override
     protected void convert(BaseViewHolder helper, LocalSong item) {
         SquareImageView albumView = helper.getView(R.id.siv_music_album);
-        String albumStr = MusicUtil.getAlbumResource(albumView.getContext(), item.getAlbumId());
-        Picasso.with(mContext)
-                .load(new File(albumStr))
-                .placeholder(R.drawable.ic_music_s)
-                .error(R.drawable.ic_music_s)
-                .into(albumView);
+        albumView.setImageResource(R.drawable.ic_music_s);
         TextView titleView = helper.getView(R.id.tv_music_title);
         titleView.setTextColor(ContextCompat.getColor(titleView.getContext(), R.color.colorPrimaryLocal));
-        titleView.setText(item.getName());
+        titleView.setText(item.getTitle());
         String singer = StringUtil.isEmpty(item.getSinger()) ? mContext.getString(R.string.music_no_singer) : item.getSinger();
         int singerLength = singer.length();
         String sep = " / ";

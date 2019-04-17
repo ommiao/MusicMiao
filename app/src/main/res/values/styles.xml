@@ -8,6 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.FullScreen" parent="AppTheme">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
     <style name="ToolbarTitleTheme">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">@dimen/toolbar_title</item>

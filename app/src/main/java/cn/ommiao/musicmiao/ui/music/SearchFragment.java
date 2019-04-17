@@ -45,7 +45,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         TextView.OnEditorActionListener,
         ViewTreeObserver.OnPreDrawListener {
 
-    private static final long REVEAL_DURATION = 500;
+    private static final long REVEAL_DURATION = 1000;
 
     private boolean isSearchEditViewShow = false;
 
