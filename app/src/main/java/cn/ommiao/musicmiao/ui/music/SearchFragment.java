@@ -1,5 +1,6 @@
 package cn.ommiao.musicmiao.ui.music;
 
+import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
@@ -8,7 +9,10 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -35,7 +39,13 @@ import cn.ommiao.musicmiao.utils.ToastUtil;
 import cn.ommiao.musicmiao.widget.SquareImageView;
 import cn.ommiao.network.SimpleRequestCallback;
 
-public class SearchFragment extends BaseFragment<FragmentSearchBinding> implements View.OnClickListener, AnimationListener, TextView.OnEditorActionListener {
+public class SearchFragment extends BaseFragment<FragmentSearchBinding> implements
+        View.OnClickListener,
+        AnimationListener,
+        TextView.OnEditorActionListener,
+        ViewTreeObserver.OnPreDrawListener {
+
+    private static final long REVEAL_DURATION = 500;
 
     private boolean isSearchEditViewShow = false;
 
@@ -71,6 +81,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         emptyBinding.tvTips.setOnClickListener(this);
         adapter.setEmptyView(emptyView);
         adapter.setOnItemClickListener(this::onItemClick);
+        mBinding.rvMusic.getViewTreeObserver().addOnPreDrawListener(this);
     }
 
     private void initAdapterLoadMore() {
@@ -249,5 +260,31 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
                 .addToBackStack("detail")
                 .replace(R.id.fl_container, detailFragment)
                 .commit();
+    }
+
+    @Override
+    public boolean onPreDraw() {
+        mBinding.rvMusic.getViewTreeObserver().removeOnPreDrawListener(this);
+        startReveal(mBinding.ivMusic, mBinding.getRoot());
+        return true;
+    }
+
+    private void startReveal(View triggerView, View animView){
+        int[] tvLocation = new int[2];
+        triggerView.getLocationInWindow(tvLocation);
+        int tvX = tvLocation[0] + triggerView.getWidth() / 2;
+        int tvY = tvLocation[1] + triggerView.getHeight() / 2;
+        int[] avLocation = new int[2];
+        animView.getLocationInWindow(avLocation);
+        int avX = avLocation[0] + animView.getWidth() / 2;
+        int avY = avLocation[1] + animView.getHeight() / 2;
+        int rippleW = tvX < avX ? animView.getWidth() - tvX : tvX - avLocation[0];
+        int rippleY = tvY < avY ? animView.getHeight() - tvY : tvY - avLocation[1];
+        float startRadius = 0f;
+        float endRadius = (float) Math.sqrt(rippleW * rippleW + rippleY * rippleY);
+        Animator animator = ViewAnimationUtils.createCircularReveal(animView, tvX, tvY, startRadius, endRadius);
+        animator.setDuration(REVEAL_DURATION);
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.start();
     }
 }

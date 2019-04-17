@@ -17,5 +17,9 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">24sp</item>
     </style>
+    
+    <style name="AppTheme.LocalRecyclerViewStyle" parent="AppTheme">
+        <item name="android:colorEdgeEffect">@color/colorPrimaryLocal</item>
+    </style>
 
 </resources>

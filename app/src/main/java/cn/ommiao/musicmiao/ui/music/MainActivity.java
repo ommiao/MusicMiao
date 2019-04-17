@@ -23,10 +23,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
 
     @Override
     protected void initViews() {
-        SearchFragment searchFragment = new SearchFragment();
+        //SearchFragment fragment = new SearchFragment();
+        LocalMusicFragment fragment = new LocalMusicFragment();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fl_container, searchFragment)
+                .replace(R.id.fl_container, fragment)
                 .commit();
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             requestPermission();
