@@ -17,13 +17,14 @@ import java.util.HashMap;
 
 import cn.ommiao.musicmiao.interfaces.OnBackPressedListener;
 import cn.ommiao.network.BaseRequest;
+import cn.ommiao.network.HttpCall;
 import cn.ommiao.network.RequestCallBack;
 import cn.ommiao.network.RequestInBase;
 import cn.ommiao.network.RequestOutBase;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment implements OnBackPressedListener {
+public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment implements OnBackPressedListener, HttpCall {
 
     public static final boolean LOADING = true;
     public static final boolean NO_LOADING = false;
@@ -90,14 +91,14 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment i
         }
     }
 
-    private <OUT extends RequestOutBase> RequestCallBack<OUT> arrangeCallback(final String url, final RequestInBase in, final RequestCallBack<OUT> callBack) {
+    @Override
+    public <OUT extends RequestOutBase> RequestCallBack<OUT> arrangeCallback(final String url, final RequestInBase in, final RequestCallBack<OUT> callBack) {
         RequestCallBack<OUT> temp = new RequestCallBack<OUT>() {
             @Override
             public void onSuccess(OUT result, String str, Response<ResponseBody> res) {
                 callBacks.remove(in);
                 requests.remove(url);
                 callBack.onSuccess(result, str, res);
-                hideLoading();
             }
 
             @Override
@@ -105,7 +106,6 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment i
                 callBacks.remove(in);
                 requests.remove(url);
                 callBack.onError(code,  message, err);
-                hideLoading();
             }
 
             @Override
@@ -113,26 +113,24 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment i
                 callBacks.remove(in);
                 requests.remove(url);
                 callBack.onCancel();
-                hideLoading();
             }
         };
         callBacks.put(in, temp);
         return temp;
     }
 
-    private void hideLoading() {
-
-    }
-
-    protected <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, IN in, RequestCallBack<OUT> callBack) {
+    @Override
+    public <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, IN in, RequestCallBack<OUT> callBack) {
         newCall(request, NO_LOADING, null, in, callBack);
     }
 
-    protected <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, IN in, RequestCallBack<OUT> callBack) {
+    @Override
+    public <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, IN in, RequestCallBack<OUT> callBack) {
         newCall(request, showLoading, null, in, callBack);
     }
 
-    protected  <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, String msg, IN in, RequestCallBack<OUT> callBack) {
+    @Override
+    public <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, String msg, IN in, RequestCallBack<OUT> callBack) {
         if(showLoading){
             showLoading(msg);
         }

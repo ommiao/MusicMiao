@@ -45,6 +45,7 @@ public class MusicUtil {
             song.setAlbum(album);
             String singer = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
             song.setSinger(singer);
+            song.setAlbumUrl("No Album Url.");
         } catch (Exception e) {
             e.printStackTrace();
         }

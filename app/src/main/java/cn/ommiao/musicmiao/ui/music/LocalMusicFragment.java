@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.gyf.barlibrary.ImmersionBar;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 
@@ -37,7 +36,7 @@ public class LocalMusicFragment extends BaseFragment<FragmentLocalMusicBinding> 
             startMusicSearch();
             return true;
         });
-        adapter = new LocalSongListAdapter(R.layout.item_music_search, localSongs);
+        adapter = new LocalSongListAdapter(R.layout.item_music_search, localSongs, this);
         adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM);
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(mActivity.getResources().getInteger(R.integer.search_result_span_count), StaggeredGridLayoutManager.VERTICAL);
         mBinding.rvMusic.setLayoutManager(layoutManager);
@@ -48,9 +47,6 @@ public class LocalMusicFragment extends BaseFragment<FragmentLocalMusicBinding> 
     @Override
     protected void initData() {
         ArrayList<LocalSong> songs = MusicUtil.getMusicData(mActivity);
-        for(LocalSong song : songs){
-            Logger.d(song.toHashMap());
-        }
         localSongs.addAll(songs);
         adapter.notifyDataSetChanged();
     }

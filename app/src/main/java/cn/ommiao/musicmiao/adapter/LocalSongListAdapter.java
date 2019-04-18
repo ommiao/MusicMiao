@@ -1,32 +1,72 @@
 package cn.ommiao.musicmiao.adapter;
 
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.squareup.picasso.Picasso;
 
+import org.litepal.LitePal;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.bean.LocalSong;
+import cn.ommiao.musicmiao.bean.Song;
+import cn.ommiao.musicmiao.httpcall.musicsearch.MusicSearchCall;
+import cn.ommiao.musicmiao.httpcall.musicsearch.model.MusicSearchIn;
+import cn.ommiao.musicmiao.httpcall.musicsearch.model.MusicSearchOut;
 import cn.ommiao.musicmiao.utils.StringUtil;
 import cn.ommiao.musicmiao.widget.SquareImageView;
+import cn.ommiao.network.HttpCall;
+import cn.ommiao.network.SimpleRequestCallback;
 
 public class LocalSongListAdapter extends BaseQuickAdapter<LocalSong, BaseViewHolder> {
 
-    public LocalSongListAdapter(int layoutResId, @Nullable List<LocalSong> data) {
+    private HttpCall httpCall;
+
+    public LocalSongListAdapter(int layoutResId, @Nullable List<LocalSong> data, @NonNull HttpCall httpCall) {
         super(layoutResId, data);
+        this.httpCall = httpCall;
     }
 
     @Override
     protected void convert(BaseViewHolder helper, LocalSong item) {
         SquareImageView albumView = helper.getView(R.id.siv_music_album);
-        albumView.setImageResource(R.drawable.ic_music_s);
+        List<LocalSong> songsInDb = LitePal.where("path = ?", item.getPath()).find(LocalSong.class);
+        if(songsInDb != null && songsInDb.size() > 0){
+            item = songsInDb.get(0);
+        } else {
+            MusicSearchIn in = new MusicSearchIn(item.getTitle(), 1, 1);
+            LocalSong finalItem = item;
+            httpCall.newCall(new MusicSearchCall(), in, new SimpleRequestCallback<MusicSearchOut>() {
+                @Override
+                public void onSuccess(MusicSearchOut out) {
+                    Song song = out.getSongs().get(0);
+                    if(song != null){
+                        loadAlumImage(song.getAlbumImageUrl(), albumView);
+                        finalItem.setAlbumUrl(song.getAlbumImageUrl());
+                        finalItem.save();
+                    }
+                }
+
+                @Override
+                public void onError(int code, String error) {
+                    //do nothing
+                }
+            });
+        }
+        loadAlumImage(item.getAlbumUrl(), albumView);
         TextView titleView = helper.getView(R.id.tv_music_title);
         titleView.setTextColor(ContextCompat.getColor(titleView.getContext(), R.color.colorPrimaryLocal));
         titleView.setText(item.getTitle());
@@ -41,5 +81,17 @@ public class LocalSongListAdapter extends BaseQuickAdapter<LocalSong, BaseViewHo
         SpannableString singerAndAlbumSpan = new SpannableString(singerAndAlbum);
         singerAndAlbumSpan.setSpan(new AbsoluteSizeSpan(mContext.getResources().getDimensionPixelSize(R.dimen.music_search_album), false), singerLength + sepLength, singerAndAlbumLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         helper.setText(R.id.tv_music_singer_album, singerAndAlbumSpan);
+    }
+
+    private void loadAlumImage(String imgUrl, ImageView target){
+        ColorMatrix cm = new ColorMatrix();
+        cm.setSaturation(0);
+        ColorMatrixColorFilter grayColorFilter = new ColorMatrixColorFilter(cm);
+        target.setColorFilter(grayColorFilter);
+        Picasso.with(mContext)
+                .load(imgUrl)
+                .placeholder(R.drawable.ic_music_s)
+                .error(R.drawable.ic_music_s)
+                .into(target);
     }
 }

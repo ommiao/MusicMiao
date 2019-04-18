@@ -1,10 +1,14 @@
 package cn.ommiao.musicmiao.bean;
 
-import cn.ommiao.bean.JavaBean;
+import org.litepal.annotation.Column;
+import org.litepal.crud.LitePalSupport;
 
-public class LocalSong extends JavaBean {
+public class LocalSong extends LitePalSupport {
 
-    private String title, name, singer, album, path;
+    @Column(unique = true, defaultValue = "unknown")
+    private String path;
+
+    private String title, name, singer, album, albumUrl;
 
     private int duration;
 
@@ -50,6 +54,14 @@ public class LocalSong extends JavaBean {
         this.album = album;
     }
 
+    public String getAlbumUrl() {
+        return albumUrl;
+    }
+
+    public void setAlbumUrl(String albumUrl) {
+        this.albumUrl = albumUrl;
+    }
+
     public String getPath() {
         return path;
     }
@@ -73,4 +85,5 @@ public class LocalSong extends JavaBean {
     public void setSize(long size) {
         this.size = size;
     }
+
 }

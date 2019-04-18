@@ -5,11 +5,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.orhanobut.logger.Logger;
+
+import org.litepal.LitePal;
 
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.databinding.ActivitySplashBinding;
@@ -19,11 +20,6 @@ import cn.ommiao.musicmiao.ui.music.MainActivity;
 import cn.ommiao.musicmiao.utils.ToastUtil;
 
 public class SplashActivity extends BaseActivity<ActivitySplashBinding> implements CustomDialogFragment.OnClickActionListener {
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     protected int getLayoutId() {
@@ -41,7 +37,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> implemen
 
     @Override
     protected void initData() {
-
+        LitePal.getDatabase();
     }
 
     private void requestPermission() {

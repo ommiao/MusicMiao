@@ -13,13 +13,14 @@ import java.util.HashMap;
 
 import cn.ommiao.musicmiao.interfaces.OnBackPressedListener;
 import cn.ommiao.network.BaseRequest;
+import cn.ommiao.network.HttpCall;
 import cn.ommiao.network.RequestCallBack;
 import cn.ommiao.network.RequestInBase;
 import cn.ommiao.network.RequestOutBase;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatActivity {
+public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatActivity implements HttpCall {
 
     protected T mBinding;
 
@@ -89,7 +90,8 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
 
     }
 
-    private <OUT extends RequestOutBase> RequestCallBack<OUT> arrangeCallback(final String url, final RequestInBase in, final RequestCallBack<OUT> callBack) {
+    @Override
+    public <OUT extends RequestOutBase> RequestCallBack<OUT> arrangeCallback(final String url, final RequestInBase in, final RequestCallBack<OUT> callBack) {
         RequestCallBack<OUT> temp = new RequestCallBack<OUT>() {
             @Override
             public void onSuccess(OUT result, String str, Response<ResponseBody> res) {
@@ -119,15 +121,18 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
         return temp;
     }
 
-    protected <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, IN in, RequestCallBack<OUT> callBack) {
+    @Override
+    public <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, IN in, RequestCallBack<OUT> callBack) {
         newCall(request, NO_LOADING, null, in, callBack);
     }
 
-    protected <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, IN in, RequestCallBack<OUT> callBack) {
+    @Override
+    public <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, IN in, RequestCallBack<OUT> callBack) {
         newCall(request, showLoading, null, in, callBack);
     }
 
-    protected  <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, String msg, IN in, RequestCallBack<OUT> callBack) {
+    @Override
+    public <IN extends RequestInBase, OUT extends RequestOutBase> void newCall(BaseRequest<IN, OUT> request, boolean showLoading, String msg, IN in, RequestCallBack<OUT> callBack) {
         if(showLoading){
             showLoading(msg);
         }
