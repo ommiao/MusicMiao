@@ -18,8 +18,9 @@ import cn.ommiao.musicmiao.ui.base.BaseActivity;
 import cn.ommiao.musicmiao.ui.music.CustomDialogFragment;
 import cn.ommiao.musicmiao.ui.music.MainActivity;
 import cn.ommiao.musicmiao.utils.ToastUtil;
+import cn.ommiao.musicmiao.widget.MusicPathView;
 
-public class SplashActivity extends BaseActivity<ActivitySplashBinding> implements CustomDialogFragment.OnClickActionListener {
+public class SplashActivity extends BaseActivity<ActivitySplashBinding> implements CustomDialogFragment.OnClickActionListener, MusicPathView.OnAnimationEndListener {
 
     @Override
     protected int getLayoutId() {
@@ -31,8 +32,22 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> implemen
         if(ContextCompat.checkSelfPermission(SplashActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             requestPermission();
         } else {
-            startMainActivity();
+            startAnimation();
         }
+    }
+
+    private void startAnimation(){
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            runOnUiThread(() -> {
+                mBinding.musicPath.setOnAnimationEndListener(this);
+                mBinding.musicPath.startAnimation();
+            });
+        }).start();
     }
 
     @Override
@@ -70,10 +85,14 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> implemen
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-            Logger.d("Permission Granted.");
-            startMainActivity();
+            startAnimation();
         } else{
             ToastUtil.show("读写存储权限被拒绝！");
         }
+    }
+
+    @Override
+    public void onAnimationEnd() {
+        startMainActivity();
     }
 }

@@ -5,10 +5,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
+        <cn.ommiao.musicmiao.widget.MusicPathView
+            android:id="@+id/music_path"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/ic_launcher_round"
             android:layout_gravity="center"/>
 
     </FrameLayout>
