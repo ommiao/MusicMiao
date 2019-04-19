@@ -4,12 +4,11 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
+import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
@@ -17,7 +16,6 @@ import com.squareup.picasso.Picasso;
 
 import org.litepal.LitePal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import cn.ommiao.musicmiao.R;
@@ -28,6 +26,7 @@ import cn.ommiao.musicmiao.httpcall.musicsearch.model.MusicSearchIn;
 import cn.ommiao.musicmiao.httpcall.musicsearch.model.MusicSearchOut;
 import cn.ommiao.musicmiao.utils.StringUtil;
 import cn.ommiao.musicmiao.widget.SquareImageView;
+import cn.ommiao.musicmiao.widget.playpause.PlayingView;
 import cn.ommiao.network.HttpCall;
 import cn.ommiao.network.SimpleRequestCallback;
 
@@ -42,10 +41,12 @@ public class LocalSongListAdapter extends BaseQuickAdapter<LocalSong, BaseViewHo
 
     @Override
     protected void convert(BaseViewHolder helper, LocalSong item) {
+        boolean isPlaying = item.isPlaying();
         SquareImageView albumView = helper.getView(R.id.siv_music_album);
         List<LocalSong> songsInDb = LitePal.where("path = ?", item.getPath()).find(LocalSong.class);
         if(songsInDb != null && songsInDb.size() > 0){
             item = songsInDb.get(0);
+            item.setPlaying(isPlaying);
         } else {
             MusicSearchIn in = new MusicSearchIn(item.getTitle(), 1, 1);
             LocalSong finalItem = item;
@@ -67,9 +68,7 @@ public class LocalSongListAdapter extends BaseQuickAdapter<LocalSong, BaseViewHo
             });
         }
         loadAlumImage(item.getAlbumUrl(), albumView);
-        TextView titleView = helper.getView(R.id.tv_music_title);
-        titleView.setTextColor(ContextCompat.getColor(titleView.getContext(), R.color.colorPrimaryLocal));
-        titleView.setText(item.getTitle());
+        helper.setText(R.id.tv_music_title, item.getTitle());
         String singer = StringUtil.isEmpty(item.getSinger()) ? mContext.getString(R.string.music_no_singer) : item.getSinger();
         int singerLength = singer.length();
         String sep = " / ";
@@ -81,6 +80,14 @@ public class LocalSongListAdapter extends BaseQuickAdapter<LocalSong, BaseViewHo
         SpannableString singerAndAlbumSpan = new SpannableString(singerAndAlbum);
         singerAndAlbumSpan.setSpan(new AbsoluteSizeSpan(mContext.getResources().getDimensionPixelSize(R.dimen.music_search_album), false), singerLength + sepLength, singerAndAlbumLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         helper.setText(R.id.tv_music_singer_album, singerAndAlbumSpan);
+        PlayingView playingView = helper.getView(R.id.playing);
+        if(item.isPlaying()){
+            playingView.setVisibility(View.VISIBLE);
+            playingView.start();
+        } else {
+            playingView.stop();
+            playingView.setVisibility(View.GONE);
+        }
     }
 
     private void loadAlumImage(String imgUrl, ImageView target){

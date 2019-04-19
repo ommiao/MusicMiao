@@ -47,6 +47,7 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'org.litepal.android:java:3.0.0'
+    implementation 'com.facebook.rebound:rebound:0.3.8'
     implementation project(':network')
     implementation project(':lyricsview')
     implementation project(':sweetsheet')

@@ -14,6 +14,9 @@ public class LocalSong extends LitePalSupport {
 
     private long id, size;
 
+    @Column(ignore = true)
+    private boolean playing;
+
     public long getId() {
         return id;
     }
@@ -86,4 +89,11 @@ public class LocalSong extends LitePalSupport {
         this.size = size;
     }
 
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
+    }
 }

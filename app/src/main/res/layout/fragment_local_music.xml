@@ -67,6 +67,18 @@
                 tools:itemCount="3"
                 tools:spanCount="2"/>
 
+            <cn.ommiao.musicmiao.widget.playpause.PlayPauseView
+                android:id="@+id/play_pause"
+                android:layout_width="@dimen/play_pause_size"
+                android:layout_height="@dimen/play_pause_size"
+                android:elevation="3dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_margin="16dp"
+                app:isCircleDraw="true"
+                android:layout_gravity="bottom|end"
+                app:backgroundColor="@color/colorPrimaryLocal"/>
+
         </FrameLayout>
 
     </LinearLayout>

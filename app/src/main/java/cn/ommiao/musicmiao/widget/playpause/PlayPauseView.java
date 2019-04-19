@@ -60,8 +60,8 @@ public class PlayPauseView extends FrameLayout {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PlayPauseView);
         isDrawCircle = typedArray.getBoolean(R.styleable.PlayPauseView_isCircleDraw, true);
         circleAlpha = typedArray.getInt(R.styleable.PlayPauseView_circleAlpha, 255);
-        mBackgroundColor = ContextCompat.getColor(context, R.color.colorPrimary);
-        mDrawableColor = Color.WHITE;
+        mBackgroundColor = typedArray.getColor(R.styleable.PlayPauseView_backgroundColor, ContextCompat.getColor(context, R.color.colorPrimary));
+        mDrawableColor = typedArray.getColor(R.styleable.PlayPauseView_drawableColor, Color.WHITE);
         typedArray.recycle();
 
         mPaint.setAntiAlias(true);

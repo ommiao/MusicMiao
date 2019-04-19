@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white"
+    app:cardCornerRadius="7dp"
+    app:cardElevation="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <cn.ommiao.musicmiao.widget.SquareImageView
+            android:id="@+id/siv_music_album"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_music_s"/>
+
+        <TextView
+            android:id="@+id/tv_music_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textSize="@dimen/music_search_title"
+            android:textStyle="bold"
+            android:ellipsize="end"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/colorPrimaryLocal"
+            tools:text="明天，你好"/>
+
+        <TextView
+            android:id="@+id/tv_music_singer_album"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:textSize="@dimen/music_search_singer"
+            tools:text="牛奶咖啡 / 牛奶咖啡"/>
+
+    </LinearLayout>
+
+    <cn.ommiao.musicmiao.widget.playpause.PlayingView
+        android:id="@+id/playing"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_margin="10dp"
+        android:layout_gravity="top|end"
+        app:pointerWidth="3"
+        android:visibility="gone"/>
+
+</android.support.v7.widget.CardView>
