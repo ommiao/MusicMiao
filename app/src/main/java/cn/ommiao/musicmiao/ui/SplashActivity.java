@@ -8,8 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
-import com.orhanobut.logger.Logger;
-
 import org.litepal.LitePal;
 
 import cn.ommiao.musicmiao.R;
@@ -21,6 +19,8 @@ import cn.ommiao.musicmiao.utils.ToastUtil;
 import cn.ommiao.musicmiao.widget.MusicPathView;
 
 public class SplashActivity extends BaseActivity<ActivitySplashBinding> implements CustomDialogFragment.OnClickActionListener, MusicPathView.OnAnimationEndListener {
+
+    private static final long ANIMATION_DELAY = 300;
 
     @Override
     protected int getLayoutId() {
@@ -39,7 +39,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> implemen
     private void startAnimation(){
         new Thread(() -> {
             try {
-                Thread.sleep(500);
+                Thread.sleep(ANIMATION_DELAY);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

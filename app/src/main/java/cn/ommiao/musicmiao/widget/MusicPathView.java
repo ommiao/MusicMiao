@@ -10,14 +10,15 @@ import android.graphics.PathMeasure;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.widget.playpause.SimpleAnimatorListener;
 
 public class MusicPathView extends View {
 
-    private static final long DURATION = 1500;
+    private static final long DURATION = 1000;
 
     private int width = 200, height = 200;
     private Path pathStart = new Path(), pathEnd = new Path();
@@ -59,7 +60,6 @@ public class MusicPathView extends View {
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeCap(Paint.Cap.BUTT);
-        paint.setStrokeJoin(Paint.Join.BEVEL);
         paint.setStrokeWidth(25);
         paint.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLocal));
 
@@ -110,7 +110,7 @@ public class MusicPathView extends View {
 
         animatorBackStart = ValueAnimator.ofFloat(0, 1);
         animatorBackStart.setDuration((long) (DURATION * startBackRatio));
-        animatorBackStart.setInterpolator(new AccelerateDecelerateInterpolator());
+        animatorBackStart.setInterpolator(new DecelerateInterpolator());
         animatorBackStart.addUpdateListener(animation -> {
             processBackStart = (float) animation.getAnimatedValue();
             invalidate();
@@ -127,7 +127,7 @@ public class MusicPathView extends View {
 
         animatorBackEnd = ValueAnimator.ofFloat(0, 1);
         animatorBackEnd.setDuration((long) (DURATION * endBackRatio));
-        animatorBackEnd.setInterpolator(new AccelerateDecelerateInterpolator());
+        animatorBackEnd.setInterpolator(new AccelerateInterpolator());
         animatorBackEnd.addUpdateListener(animation -> {
             processBackEnd = (float) animation.getAnimatedValue();
             invalidate();
@@ -141,7 +141,7 @@ public class MusicPathView extends View {
 
         animatorEnd = ValueAnimator.ofFloat(0, 1);
         animatorEnd.setDuration((long) (DURATION * endRatio));
-        animatorEnd.setInterpolator(new AccelerateDecelerateInterpolator());
+        animatorEnd.setInterpolator(new DecelerateInterpolator());
         animatorEnd.addUpdateListener(animation -> {
             processEnd = (float) animation.getAnimatedValue();
             invalidate();
@@ -155,7 +155,7 @@ public class MusicPathView extends View {
 
         animatorStart = ValueAnimator.ofFloat(0, 1);
         animatorStart.setDuration((long) (DURATION * startRatio));
-        animatorStart.setInterpolator(new AccelerateDecelerateInterpolator());
+        animatorStart.setInterpolator(new AccelerateInterpolator());
         animatorStart.addUpdateListener(animation -> {
             processStart = (float) animation.getAnimatedValue();
             invalidate();
