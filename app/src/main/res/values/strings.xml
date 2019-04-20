@@ -32,4 +32,5 @@
     <string name="music_play_fail">音乐播放失败</string>
     <string name="music_lyrics_loading">加载歌词中…</string>
     <string name="music_lyrics_none">暂无歌词</string>
+    <string name="music_local_empty_tips">未扫描到本地音乐</string>
 </resources>

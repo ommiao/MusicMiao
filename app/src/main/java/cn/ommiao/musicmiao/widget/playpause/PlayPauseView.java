@@ -254,6 +254,13 @@ public class PlayPauseView extends FrameLayout {
         stopProgress();
     }
 
+    public void stop(){
+        if(isTransitionStatus()){
+            return;
+        }
+        stopProgress();
+    }
+
     private float progress = 0f;
     public void setProgress(float progress){
         if(playStatus == PlayStatus.NONE){
@@ -266,7 +273,7 @@ public class PlayPauseView extends FrameLayout {
         //playStatus = PlayStatus.PROGRESS;
         if(playStatus == PlayStatus.LOADING){
             stopLoading();
-        } else if(playStatus == PlayStatus.PROGRESS){
+        } else if(playStatus == PlayStatus.PROGRESS && !isRollbacking){
             sweepAngle = getProgressAngle();
             invalidate();
             if(getProgressAngle() >= 360){
@@ -289,7 +296,9 @@ public class PlayPauseView extends FrameLayout {
             public void onAnimationEnd(Animator animation) {
                 progress = 0f;
                 playStatus = PlayStatus.NONE;
-                playToPause();
+                if(mIsPlay){
+                    playToPause();
+                }
             }
         });
         stopProgressAnimator.start();
@@ -322,11 +331,45 @@ public class PlayPauseView extends FrameLayout {
         pausePlayAnim.start();
     }
 
+    private boolean isRollbacking = false;
+    public void rollbackProgress(){
+        if(isTransitionStatus()){
+            return;
+        }
+        if(playStatus != PlayStatus.PROGRESS){
+            return;
+        }
+        rollback();
+    }
+
+    private void rollback() {
+        isRollbacking = true;
+        ValueAnimator rollbackAnimator = ValueAnimator.ofFloat(sweepAngle, 0);
+        long duration = (long) (sweepAngle / (float) 360 * LOADING_PER_ROUND);
+        rollbackAnimator.setDuration(duration);
+        rollbackAnimator.setInterpolator(new LinearInterpolator());
+        rollbackAnimator.addUpdateListener(animation -> {
+            if((float)animation.getAnimatedValue() > getProgressAngle()){
+                sweepAngle = (float) animation.getAnimatedValue();
+                invalidate();
+            } else {
+                isRollbacking = false;
+            }
+        });
+        rollbackAnimator.addListener(new SimpleAnimatorListener(){
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isRollbacking = false;
+            }
+        });
+        rollbackAnimator.start();
+    }
+
     /**
      * 判断是否为过渡状态，过渡状态不接受状态切换命令
      * @return
      */
-    private boolean isTransitionStatus(){
+    public boolean isTransitionStatus(){
         return playStatus == PlayStatus.START_LOADING ||
                 playStatus == PlayStatus.STOP_LOADING ||
                 playStatus == PlayStatus.STOP_PROGRESS;

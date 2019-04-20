@@ -82,11 +82,11 @@ public class LocalSongListAdapter extends BaseQuickAdapter<LocalSong, BaseViewHo
         helper.setText(R.id.tv_music_singer_album, singerAndAlbumSpan);
         PlayingView playingView = helper.getView(R.id.playing);
         if(item.isPlaying()){
-            playingView.setVisibility(View.VISIBLE);
             playingView.start();
+            playingView.setVisibility(View.VISIBLE);
         } else {
             playingView.stop();
-            playingView.setVisibility(View.GONE);
+            playingView.setVisibility(View.INVISIBLE);
         }
     }
 

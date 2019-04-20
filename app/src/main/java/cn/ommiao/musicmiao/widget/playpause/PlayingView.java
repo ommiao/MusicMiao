@@ -14,7 +14,6 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.utils.UIUtil;
@@ -41,7 +40,7 @@ public class PlayingView extends View {
     private float pointerWidth;
 
     //指针的颜色
-    private int pointerColor = Color.RED;
+    private int pointerColor;
 
     //控制开始/停止
     private boolean isPlaying = false;
@@ -67,7 +66,7 @@ public class PlayingView extends View {
         pointerColor = ta.getColor(R.styleable.PlayingView_pointerColor, Color.WHITE);
         pointerNum = ta.getInt(R.styleable.PlayingView_pointerNum, 4);//指针的数量，默认为4
         pointerWidth = UIUtil.dp2px(ta.getFloat(R.styleable.PlayingView_pointerWidth, 5f));//指针的宽度，默认5dp
-        pointerSpeed = ta.getInt(R.styleable.PlayingView_pointerSpeed, 40);
+        pointerSpeed = ta.getInt(R.styleable.PlayingView_pointerDrawDelay, 40);
         ta.recycle();
         init();
     }
@@ -80,40 +79,22 @@ public class PlayingView extends View {
         paint.setAntiAlias(true);
         paint.setColor(pointerColor);
         pointers = new ArrayList<>();
+        for (int i = 0; i < pointerNum; i++) {
+            //创建指针对象，利用0~1的随机数 乘以 可绘制区域的高度。作为每个指针的初始高度。
+            pointers.add(new Pointer(0f));
+        }
     }
 
-
-    /**
-     * 在onLayout中做一些，宽高方面的初始化
-     *
-     * @param changed
-     * @param left
-     * @param top
-     * @param right
-     * @param bottom
-     */
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         //获取逻辑原点的，也就是画布左下角的坐标。这里减去了paddingBottom的距离
         basePointY = getHeight() - getPaddingBottom();
-        Random random = new Random();
-        if (pointers != null)
-            pointers.clear();
-        for (int i = 0; i < pointerNum; i++) {
-            //创建指针对象，利用0~1的随机数 乘以 可绘制区域的高度。作为每个指针的初始高度。
-            pointers.add(new Pointer((float) (0.1 * (random.nextInt(10) + 1) * (getHeight() - getPaddingBottom() - getPaddingTop()))));
-        }
         //计算每个指针之间的间隔  总宽度 - 左右两边的padding - 所有指针占去的宽度  然后再除以间隔的数量
         pointerPadding = (getWidth() - getPaddingLeft() - getPaddingRight() - pointerWidth * pointerNum) / (pointerNum - 1);
     }
 
 
-    /**
-     * 开始绘画
-     *
-     * @param canvas
-     */
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -171,20 +152,18 @@ public class PlayingView extends View {
 
         @Override
         public void run() {
-
-            for (float i = 0; i < Integer.MAX_VALUE; ) {//创建一个死循环，每循环一次i+0.1
-                try {
-                    for (int j = 0; j < pointers.size(); j++) { //循环改变每个指针高度
-                        float rate = (float) Math.abs(Math.sin(i + j));//利用正弦有规律的获取0~1的数。
-                        pointers.get(j).setHeight((basePointY - getPaddingTop()) * rate); //rate 乘以 可绘制高度，来改变每个指针的高度
-                    }
-                    Thread.sleep(pointerSpeed);//休眠一下下，可自行调节
-                    if (isPlaying) { //控制开始/暂停
+            if(isPlaying){
+                for (float i = 0; i < Integer.MAX_VALUE; i += 0.1) {//创建一个死循环，每循环一次i+0.1
+                    try {
+                        for (int j = 0; j < pointers.size(); j++) { //循环改变每个指针高度
+                            float rate = (float) Math.abs(Math.sin(i + j));//利用正弦有规律的获取0~1的数。
+                            pointers.get(j).setHeight((basePointY - getPaddingTop()) * rate); //rate 乘以 可绘制高度，来改变每个指针的高度
+                        }
+                        Thread.sleep(pointerSpeed);//休眠一下下，可自行调节
                         myHandler.sendEmptyMessage(0);
-                        i += 0.1;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         }
@@ -197,7 +176,7 @@ public class PlayingView extends View {
     public class Pointer {
         private float height;
 
-        public Pointer(float height) {
+        private Pointer(float height) {
             this.height = height;
         }
 

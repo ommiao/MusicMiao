@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.provider.MediaStore;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import cn.ommiao.musicmiao.bean.LocalSong;
@@ -27,7 +28,11 @@ public class MusicUtil {
                     if(StringUtil.isEmpty(song.getTitle())){
                         song.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)));
                     }
-                    list.add(song);
+                    if(!song.getPath().endsWith(".ape")
+                            && !song.getPath().endsWith(".flac")
+                            && new File(song.getPath()).exists()){
+                        list.add(song);
+                    }
                 }
             }
             cursor.close();
@@ -40,11 +45,11 @@ public class MusicUtil {
         try {
             mmr.setDataSource(song.getPath());
             String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            song.setTitle(title);
             String album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-            song.setAlbum(album);
             String singer = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            song.setTitle(title);
             song.setSinger(singer);
+            song.setAlbum(album);
             song.setAlbumUrl("No Album Url.");
         } catch (Exception e) {
             e.printStackTrace();

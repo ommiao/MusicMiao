@@ -12,7 +12,7 @@
         <attr name="pointerColor" format="color" />
         <attr name="pointerNum" format="integer" />
         <attr name="pointerWidth" format="float" />
-        <attr name="pointerSpeed" format="integer" />
+        <attr name="pointerDrawDelay" format="integer" />
     </declare-styleable>
 
 </resources>

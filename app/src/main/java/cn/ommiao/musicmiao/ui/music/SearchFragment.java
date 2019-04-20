@@ -74,7 +74,6 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         mBinding.rvMusic.setLayoutManager(layoutManager);
         mBinding.rvMusic.setAdapter(adapter);
         mBinding.rvMusic.addItemDecoration(new StaggeredDividerItemDecoration(mActivity, mActivity.getResources().getDimensionPixelSize(R.dimen.music_list_item_space)));
-        @SuppressLint("InflateParams")
         View emptyView = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_list_empty, null);
         emptyBinding = DataBindingUtil.bind(emptyView);
         assert emptyBinding != null;

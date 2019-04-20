@@ -53,6 +53,8 @@ import cn.ommiao.network.SimpleRequestCallback;
 
 public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding> {
 
+    private static final String MUSIC_DOWNLOAD_PATH = "MiaoLe/Music";
+
     private static final String SUFFIX_MP3_NQ = "-NQ.mp3";
     private static final String SUFFIX_MP3_HQ = "-HQ.mp3";
     private static final String SUFFIX_FLAC = ".flac";
@@ -126,9 +128,12 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         requestVkey();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void initLocalFileStatus() {
-        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).mkdir();
-        String downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath();
+        if(!Environment.getExternalStoragePublicDirectory(MUSIC_DOWNLOAD_PATH).exists()){
+            Environment.getExternalStoragePublicDirectory(MUSIC_DOWNLOAD_PATH).mkdirs();
+        }
+        String downloadDir = Environment.getExternalStoragePublicDirectory(MUSIC_DOWNLOAD_PATH).getAbsolutePath();
         fileName = song.getTitle() + "-" + song.getOneSinger();
         String commonPath = downloadDir + "/" + fileName;
         song.getFile().setHasLocalNqMp3(new File(commonPath + SUFFIX_MP3_NQ).exists());
@@ -242,7 +247,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         DownloadManager manager = (DownloadManager) mActivity.getSystemService(BaseActivity.DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, fileName + suffix);
+        request.setDestinationInExternalPublicDir(MUSIC_DOWNLOAD_PATH, fileName + suffix);
         request.setVisibleInDownloadsUi(true);
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.allowScanningByMediaScanner();
