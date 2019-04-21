@@ -1,13 +1,11 @@
 package cn.ommiao.musicmiao.ui.music;
 
 import android.Manifest;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +18,7 @@ import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.arialyy.aria.core.Aria;
 import com.gyf.barlibrary.ImmersionBar;
 import com.lauzy.freedom.library.Lrc;
 import com.lauzy.freedom.library.LrcHelper;
@@ -30,12 +29,15 @@ import com.orhanobut.logger.Logger;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import org.litepal.LitePal;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.ommiao.musicmiao.R;
+import cn.ommiao.musicmiao.bean.SongTask;
 import cn.ommiao.musicmiao.bean.Song;
 import cn.ommiao.musicmiao.databinding.FragmentMusicDetailBinding;
 import cn.ommiao.musicmiao.databinding.LayoutMusicDownloadBinding;
@@ -45,7 +47,7 @@ import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryOut;
 import cn.ommiao.musicmiao.httpcall.vkey.VkeyCall;
 import cn.ommiao.musicmiao.httpcall.vkey.model.VkeyIn;
 import cn.ommiao.musicmiao.httpcall.vkey.model.VkeyOut;
-import cn.ommiao.musicmiao.ui.base.BaseActivity;
+import cn.ommiao.musicmiao.interfaces.DownloadActionListener;
 import cn.ommiao.musicmiao.ui.base.BaseFragment;
 import cn.ommiao.musicmiao.utils.StringUtil;
 import cn.ommiao.musicmiao.utils.ToastUtil;
@@ -72,6 +74,12 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     private Handler handler = new Handler();
     private WifiManager.WifiLock wifiLock;
     private Runnable progressRunnable;
+
+    private DownloadActionListener downloadActionListener;
+
+    public void setDownloadActionListener(DownloadActionListener downloadActionListener) {
+        this.downloadActionListener = downloadActionListener;
+    }
 
     @Override
     protected void immersionBar() {
@@ -113,7 +121,6 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         View view = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_download, null);
         downloadBinding = DataBindingUtil.bind(view);
         assert downloadBinding != null;
-        downloadBinding.setSongFile(song.getFile());
         downloadBinding.ivClose.setOnClickListener(v -> closeDownloadView());
         downloadBinding.flMp3Normal.setOnClickListener(v -> onMp3NormalClick());
         downloadBinding.flMp3High.setOnClickListener(v -> onMp3HighClick());
@@ -140,6 +147,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         song.getFile().setHasLocalHqMp3(new File(commonPath + SUFFIX_MP3_HQ).exists());
         song.getFile().setHasLocalFlac(new File(commonPath + SUFFIX_FLAC).exists());
         song.getFile().setHasLocalApe(new File(commonPath + SUFFIX_APE).exists());
+        downloadBinding.setSongFile(song.getFile());
     }
 
     @Override
@@ -200,7 +208,6 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         }
         //download start
         downloadSong(song.getMp3NqLink(), SUFFIX_MP3_NQ);
-        closeDownloadViewDelay();
     }
 
     private void onMp3HighClick() {
@@ -213,7 +220,6 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         }
         //download start
         downloadSong(song.getMp3HqLink(), SUFFIX_MP3_HQ);
-        closeDownloadViewDelay();
     }
 
     private void onFlacClick() {
@@ -226,7 +232,6 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         }
         //download start
         downloadSong(song.getFlacLink(), SUFFIX_FLAC);
-        closeDownloadViewDelay();
     }
 
     private void onApeClick() {
@@ -239,41 +244,77 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         }
         //download start
         downloadSong(song.getApeLink(), SUFFIX_APE);
-        closeDownloadViewDelay();
     }
 
     private void downloadSong(String songUrl, String suffix) {
-        Uri uri = Uri.parse(songUrl);
-        DownloadManager manager = (DownloadManager) mActivity.getSystemService(BaseActivity.DOWNLOAD_SERVICE);
-        DownloadManager.Request request = new DownloadManager.Request(uri);
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-        request.setDestinationInExternalPublicDir(MUSIC_DOWNLOAD_PATH, fileName + suffix);
-        request.setVisibleInDownloadsUi(true);
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.allowScanningByMediaScanner();
-        request.setTitle(fileName);
-        request.setDescription(fileName);
-        try {
-            manager.enqueue(request);
-            downloadResult = getString(R.string.music_download_already_add);
-            switch (suffix) {
-                case SUFFIX_MP3_NQ:
-                    song.getFile().setHasLocalNqMp3(true);
-                    break;
-                case SUFFIX_MP3_HQ:
-                    song.getFile().setHasLocalHqMp3(true);
-                    break;
-                case SUFFIX_FLAC:
-                    song.getFile().setHasLocalFlac(true);
-                    break;
-                case SUFFIX_APE:
-                    song.getFile().setHasLocalApe(true);
-                    break;
-            }
-            downloadBinding.setSongFile(song.getFile());
-        } catch (Exception e) {
-            downloadResult = getString(R.string.music_download_add_fail);
+        boolean hasDownloaded = false;
+        switch (suffix) {
+            case SUFFIX_MP3_NQ:
+                hasDownloaded = song.getFile().isHasLocalNqMp3();
+                break;
+            case SUFFIX_MP3_HQ:
+                hasDownloaded = song.getFile().isHasLocalHqMp3();
+                break;
+            case SUFFIX_FLAC:
+                hasDownloaded = song.getFile().isHasLocalFlac();
+                break;
+            case SUFFIX_APE:
+                hasDownloaded = song.getFile().isHasLocalApe();
+                break;
         }
+        if(downloadActionListener != null && (downloadActionListener.isTaskExists(fileName + suffix) || hasDownloaded)){
+            showAlreadyExistsDialog();
+            return;
+        }
+        List<SongTask> records = LitePal.where("displayName = ?", fileName + suffix).find(SongTask.class);
+        for(SongTask record : records){
+            Aria.download(mActivity)
+                    .load(record.getUrl())
+                    .removeRecord();
+        }
+        String localPath = Environment.getExternalStoragePublicDirectory(MUSIC_DOWNLOAD_PATH).getAbsolutePath() + "/" + fileName + suffix;
+        if(downloadActionListener != null){
+            SongTask task = new SongTask();
+            task.setUrl(songUrl);
+            task.setDisplayName(fileName + suffix);
+            task.setLocalPath(localPath);
+            task.setDownoadingSize(0);
+            task.setTotalSize(0);
+            task.setDownloadStatus(SongTask.DOWNLOAD_STATUS_WAIT);
+            task.save();
+            downloadActionListener.onAddDownloadTask(task);
+        }
+        Aria.download(mActivity)
+                .load(songUrl)
+                .setFilePath(localPath)
+                .start();
+        downloadResult = getString(R.string.music_download_already_add);
+        switch (suffix) {
+            case SUFFIX_MP3_NQ:
+                song.getFile().setHasLocalNqMp3(true);
+                break;
+            case SUFFIX_MP3_HQ:
+                song.getFile().setHasLocalHqMp3(true);
+                break;
+            case SUFFIX_FLAC:
+                song.getFile().setHasLocalFlac(true);
+                break;
+            case SUFFIX_APE:
+                song.getFile().setHasLocalApe(true);
+                break;
+        }
+        downloadBinding.setSongFile(song.getFile());
+        closeDownloadViewDelay();
+    }
+
+    private void showAlreadyExistsDialog() {
+        CustomDialogFragment customDialogFragment = new CustomDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("content", getString(R.string.music_download_already_exists));
+        bundle.putBoolean("justConfirm", true);
+        customDialogFragment.setArguments(bundle);
+        customDialogFragment.setOnClickActionListener(null);
+        customDialogFragment.show(mActivity.getSupportFragmentManager(), CustomDialogFragment.class.getSimpleName());
     }
 
     private boolean isDownloadLinkPrepared() {
@@ -443,12 +484,18 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
 
     @Override
     public boolean interceptBackAction() {
-        return mSweetSheet.isShow();
+        return true;
     }
 
     @Override
     public void onBackPressed() {
-        closeDownloadView();
+        if(mSweetSheet.isShow()){
+            closeDownloadView();
+        } else {
+            assert getFragmentManager() != null;
+            mActivity.setOnBackPressedListener(null);
+            getFragmentManager().popBackStack();
+        }
     }
 
     private void closeDownloadView() {

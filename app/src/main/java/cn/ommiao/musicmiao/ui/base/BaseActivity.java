@@ -30,7 +30,7 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
     private HashMap<RequestInBase, RequestCallBack<? extends RequestOutBase>> callBacks = new HashMap<>();
     private HashMap<String, BaseRequest<? extends RequestInBase, ? extends RequestOutBase>> requests = new HashMap<>();
 
-    private OnBackPressedListener onBackPressedListener;
+    protected OnBackPressedListener onBackPressedListener;
 
     public void setOnBackPressedListener(OnBackPressedListener onBackPressedListener) {
         this.onBackPressedListener = onBackPressedListener;

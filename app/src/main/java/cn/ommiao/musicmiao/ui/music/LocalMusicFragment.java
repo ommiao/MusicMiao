@@ -21,6 +21,7 @@ import cn.ommiao.musicmiao.adapter.LocalSongListAdapter;
 import cn.ommiao.musicmiao.adapter.StaggeredDividerItemDecoration;
 import cn.ommiao.musicmiao.bean.LocalSong;
 import cn.ommiao.musicmiao.databinding.FragmentLocalMusicBinding;
+import cn.ommiao.musicmiao.interfaces.DownloadActionListener;
 import cn.ommiao.musicmiao.ui.base.BaseFragment;
 import cn.ommiao.musicmiao.utils.LongClickUtil;
 import cn.ommiao.musicmiao.utils.MusicUtil;
@@ -28,7 +29,7 @@ import cn.ommiao.musicmiao.utils.SpringUtil;
 
 public class LocalMusicFragment extends BaseFragment<FragmentLocalMusicBinding> implements BaseQuickAdapter.OnItemClickListener {
 
-    private static final long DELAY = 2000;
+    private static final long DELAY = 1600;
 
     private ArrayList<LocalSong> localSongs = new ArrayList<>();
     private LocalSongListAdapter adapter;
@@ -76,6 +77,7 @@ public class LocalMusicFragment extends BaseFragment<FragmentLocalMusicBinding> 
 
     private void startMusicSearch() {
         SearchFragment fragment = new SearchFragment();
+        fragment.setDownloadActionListener((DownloadActionListener) mActivity);
         assert getFragmentManager() != null;
         getFragmentManager()
                 .beginTransaction()

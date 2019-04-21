@@ -49,23 +49,23 @@ public class CustomDialogFragment extends DialogFragment {
         boolean justConfirm = bundle.getBoolean("justConfirm", false);
         String leftBtnStr, rightBtnStr;
         if(justConfirm){
-            mBinding.btnLeft.setVisibility(View.GONE);
+            mBinding.tvLeft.setVisibility(View.GONE);
             rightBtnStr = bundle.getString("rightBtnStr", "确定");
-            mBinding.btnRight.setText(rightBtnStr);
-            mBinding.btnRight.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPrimary));
+            mBinding.tvRight.setText(rightBtnStr);
+            mBinding.tvRight.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPrimary));
         } else {
             leftBtnStr = bundle.getString("leftBtnStr", "确定");
             rightBtnStr = bundle.getString("rightBtnStr", "取消");
-            mBinding.btnLeft.setText(leftBtnStr);
-            mBinding.btnRight.setText(rightBtnStr);
+            mBinding.tvLeft.setText(leftBtnStr);
+            mBinding.tvRight.setText(rightBtnStr);
         }
-        mBinding.btnLeft.setOnClickListener(v -> {
+        mBinding.tvLeft.setOnClickListener(v -> {
             dismiss();
             if(onClickActionListener != null){
                 onClickActionListener.onLeftClick();
             }
         });
-        mBinding.btnRight.setOnClickListener(v -> {
+        mBinding.tvRight.setOnClickListener(v -> {
             dismiss();
             if(onClickActionListener != null){
                 onClickActionListener.onRightClick();

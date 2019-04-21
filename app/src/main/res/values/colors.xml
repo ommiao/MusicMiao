@@ -8,4 +8,5 @@
     <color name="transparentHalfWhite">#CCFFFFFF</color>
     <color name="colorTextGray">@android:color/tertiary_text_light</color>
     <color name="colorPrimaryLocal">#999999</color>
+    <color name="colorDownloadProgress">#F6F6F6</color>
 </resources>

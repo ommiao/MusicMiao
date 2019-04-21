@@ -33,6 +33,7 @@ import cn.ommiao.musicmiao.databinding.LayoutMusicListEmptyBinding;
 import cn.ommiao.musicmiao.httpcall.musicsearch.MusicSearchCall;
 import cn.ommiao.musicmiao.httpcall.musicsearch.model.MusicSearchIn;
 import cn.ommiao.musicmiao.httpcall.musicsearch.model.MusicSearchOut;
+import cn.ommiao.musicmiao.interfaces.DownloadActionListener;
 import cn.ommiao.musicmiao.ui.base.BaseFragment;
 import cn.ommiao.musicmiao.utils.StringUtil;
 import cn.ommiao.musicmiao.utils.ToastUtil;
@@ -56,6 +57,12 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
     private int page = 1;
 
     private LayoutMusicListEmptyBinding emptyBinding;
+
+    private DownloadActionListener downloadActionListener;
+
+    public void setDownloadActionListener(DownloadActionListener downloadActionListener) {
+        this.downloadActionListener = downloadActionListener;
+    }
 
     @Override
     protected void initViews() {
@@ -81,6 +88,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         adapter.setEmptyView(emptyView);
         adapter.setOnItemClickListener(this::onItemClick);
         mBinding.rvMusic.getViewTreeObserver().addOnPreDrawListener(this);
+        mBinding.fabDownload.setOnClickListener(this::onDownloadClick);
     }
 
     private void initAdapterLoadMore() {
@@ -248,6 +256,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         Song song = songs.get(position);
         Bundle bundle = new Bundle();
         MusicDetailFragment detailFragment = new MusicDetailFragment();
+        detailFragment.setDownloadActionListener((DownloadActionListener) mActivity);
         mActivity.setOnBackPressedListener(detailFragment);
         bundle.putSerializable("song", song);
         bundle.putString("tran_name", song.getMid());
@@ -259,6 +268,12 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
                 .addToBackStack("detail")
                 .replace(R.id.fl_container, detailFragment)
                 .commit();
+    }
+
+    private void onDownloadClick(View v){
+        if(downloadActionListener != null){
+            downloadActionListener.onShowTasks();
+        }
     }
 
     @Override

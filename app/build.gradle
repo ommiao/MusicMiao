@@ -48,6 +48,8 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'org.litepal.android:java:3.0.0'
     implementation 'com.facebook.rebound:rebound:0.3.8'
+    implementation 'com.arialyy.aria:aria-core:3.6.3'
+    annotationProcessor 'com.arialyy.aria:aria-compiler:3.6.3'
     implementation project(':network')
     implementation project(':lyricsview')
     implementation project(':sweetsheet')

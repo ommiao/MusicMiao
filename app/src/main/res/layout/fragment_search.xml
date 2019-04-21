@@ -3,104 +3,121 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/white"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/colorPrimary"
-            android:elevation="5dp">
-
-            <View
-                android:id="@+id/v_status_bar"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:background="@color/colorPrimary" />
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/ll_title_bar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:background="@color/colorPrimary">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/colorPrimary"
+                android:elevation="5dp">
 
-                <ImageView
-                    android:id="@+id/iv_music"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="10dp"
-                    android:src="@drawable/ic_music"
-                    tools:ignore="ContentDescription" />
-
-                <FrameLayout
+                <View
+                    android:id="@+id/v_status_bar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="0dp"
+                    android:background="@color/colorPrimary" />
+
+                <LinearLayout
+                    android:id="@+id/ll_title_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:background="@color/colorPrimary">
 
                     <ImageView
-                        android:id="@+id/iv_search"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@null"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/animated_selected"
-                        android:layout_marginBottom="-1dp"/>
+                        android:id="@+id/iv_music"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_music"
+                        tools:ignore="ContentDescription" />
 
-                    <com.hanks.htextview.scale.ScaleTextView
-                        android:id="@+id/stv_title"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="@string/search_title"
-                        android:textSize="@dimen/toolbar_title"
-                        android:textColor="@android:color/white"/>
+                        android:layout_height="wrap_content">
 
-                    <EditText
-                        android:id="@+id/et_search"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:textSize="@dimen/toolbar_title"
-                        android:background="@null"
-                        style="@null"
-                        android:hint="@string/search_hint"
-                        android:textColorHint="@android:color/white"
-                        android:textColor="@android:color/white"
-                        android:visibility="invisible"
-                        android:singleLine="true"
-                        android:textCursorDrawable="@drawable/shape_cursor"
-                        android:imeOptions="actionSearch"/>
+                        <ImageView
+                            android:id="@+id/iv_search"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@null"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/animated_selected"
+                            android:layout_marginBottom="-1dp"/>
 
-                </FrameLayout>
+                        <com.hanks.htextview.scale.ScaleTextView
+                            android:id="@+id/stv_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:text="@string/search_title"
+                            android:textSize="@dimen/toolbar_title"
+                            android:textColor="@android:color/white"/>
+
+                        <EditText
+                            android:id="@+id/et_search"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:textSize="@dimen/toolbar_title"
+                            android:background="@null"
+                            style="@null"
+                            android:hint="@string/search_hint"
+                            android:textColorHint="@android:color/white"
+                            android:textColor="@android:color/white"
+                            android:visibility="invisible"
+                            android:singleLine="true"
+                            android:textCursorDrawable="@drawable/shape_cursor"
+                            android:imeOptions="actionSearch"/>
+
+                    </FrameLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_music"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:listitem="@layout/item_music_search"
+                    tools:layoutManager="StaggeredGridLayoutManager"
+                    tools:itemCount="3"
+                    tools:spanCount="2"/>
+
+            </FrameLayout>
+
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:src="@drawable/icon_download_list"
+            app:fabCustomSize="44dp"/>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rv_music"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:listitem="@layout/item_music_search"
-                tools:layoutManager="StaggeredGridLayoutManager"
-                tools:itemCount="3"
-                tools:spanCount="2"/>
+    </FrameLayout>
 
-        </FrameLayout>
 
-    </LinearLayout>
 
 </layout>

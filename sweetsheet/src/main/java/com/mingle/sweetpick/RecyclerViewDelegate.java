@@ -1,5 +1,6 @@
 package com.mingle.sweetpick;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +10,8 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.AdapterView;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.BaseViewHolder;
 import com.mingle.adapter.MenuRVAdapter;
 import com.mingle.entity.MenuEntity;
 
@@ -18,6 +21,7 @@ import com.mingle.widget.FreeGrowUpParentRelativeLayout;
 import com.mingle.widget.SweetView;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author zzz40500
@@ -25,24 +29,27 @@ import java.util.List;
  * @date 2015/8/5.
  * @github: https://github.com/zzz40500
  */
-public class RecyclerViewDelegate extends Delegate  {
+public class RecyclerViewDelegate<D, A extends BaseQuickAdapter<D, BaseViewHolder>> extends Delegate  {
 
     private SweetView mSweetView;
     private RecyclerView mRV;
-    private MenuRVAdapter mMenuRVAdapter;
+    private A mAdapter;
     private CRImageView sliderIm;
     private FreeGrowUpParentRelativeLayout mFreeGrowUpParentRelativeLayout;
-    private boolean mIsDragEnable;
+    private boolean mIsDragEnable, autoClose;
     private int mContentViewHeight;
 
-    public RecyclerViewDelegate(boolean dragEnable) {
+    public RecyclerViewDelegate(A adapter, boolean dragEnable, boolean autoClose) {
+        mAdapter = adapter;
         mIsDragEnable=dragEnable;
-
+        this.autoClose = autoClose;
     }
 
-    public RecyclerViewDelegate(boolean dragEnable  ,int contentViewHeight) {
+    public RecyclerViewDelegate(A adapter, boolean dragEnable, boolean autoClose, int contentViewHeight) {
+        mAdapter = adapter;
         mContentViewHeight = contentViewHeight;
         mIsDragEnable = dragEnable;
+        this.autoClose = autoClose;
     }
 
     @Override
@@ -51,10 +58,11 @@ public class RecyclerViewDelegate extends Delegate  {
         View rootView = LayoutInflater.from(mParentVG.getContext())
                 .inflate(R.layout.layout_rv_sweet, null, false);
 
-        mSweetView = (SweetView) rootView.findViewById(R.id.sv);
-        mFreeGrowUpParentRelativeLayout = (FreeGrowUpParentRelativeLayout) rootView.findViewById(R.id.freeGrowUpParentF);
-        mRV = (RecyclerView) rootView.findViewById(R.id.rv);
-        sliderIm = (CRImageView) rootView.findViewById(R.id.sliderIM);
+        mSweetView = rootView.findViewById(R.id.sv);
+        mFreeGrowUpParentRelativeLayout = rootView.findViewById(R.id.freeGrowUpParentF);
+        mRV = rootView.findViewById(R.id.rv);
+        Objects.requireNonNull(mRV.getItemAnimator()).setChangeDuration(0);
+        sliderIm = rootView.findViewById(R.id.sliderIM);
         mRV.setLayoutManager(new LinearLayoutManager(mParentVG.getContext(), LinearLayoutManager.VERTICAL, false));
         mSweetView.setAnimationListener(new AnimationImp());
         if(mContentViewHeight > 0){
@@ -64,7 +72,7 @@ public class RecyclerViewDelegate extends Delegate  {
         return rootView;
     }
 
-    public  RecyclerViewDelegate setContentHeight(int height){
+    public RecyclerViewDelegate setContentHeight(int height){
 
         if(height >0 && mFreeGrowUpParentRelativeLayout != null){
             mFreeGrowUpParentRelativeLayout.setContentHeight(height);
@@ -76,19 +84,17 @@ public class RecyclerViewDelegate extends Delegate  {
 
     }
 
-
-
-    protected void setMenuList(final List<MenuEntity> menuEntities) {
-
-        mMenuRVAdapter = new MenuRVAdapter(menuEntities, SweetSheet.Type.RecyclerView);
-        mRV.setAdapter(mMenuRVAdapter);
-        mMenuRVAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    @Override
+    protected void setMenuList(List<MenuEntity> list) {
+        mRV.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 if (mOnMenuItemClickListener != null) {
-                    if (mOnMenuItemClickListener.onItemClick(position, menuEntities.get(position))) {
-                        delayedDismiss();
+                    if (mOnMenuItemClickListener.onItemClick(position)) {
+                        if(autoClose){
+                            delayedDismiss();
+                        }
                     }
                 }
             }
@@ -121,7 +127,7 @@ public class RecyclerViewDelegate extends Delegate  {
     }
 
     public void notifyDataSetChanged() {
-        mMenuRVAdapter.notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
     }
 
     protected void show() {
@@ -174,7 +180,7 @@ public class RecyclerViewDelegate extends Delegate  {
         @Override
         public void onContentShow() {
             mRV.setVisibility(View.VISIBLE);
-            mRV.setAdapter(mMenuRVAdapter);
+            mRV.setAdapter(mAdapter);
             mRV.scheduleLayoutAnimation();
         }
     }

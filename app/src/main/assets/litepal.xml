@@ -6,6 +6,7 @@
 
     <list>
         <mapping class="cn.ommiao.musicmiao.bean.LocalSong"/>
+        <mapping class="cn.ommiao.musicmiao.bean.SongTask"/>
     </list>
 
 </litepal>

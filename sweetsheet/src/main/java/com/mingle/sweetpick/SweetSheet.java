@@ -200,6 +200,7 @@ public class SweetSheet {
 
     public interface OnMenuItemClickListener {
         boolean onItemClick(int position, MenuEntity menuEntity);
+        boolean onItemClick(int position);
     }
 
 }

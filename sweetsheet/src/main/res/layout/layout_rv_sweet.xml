@@ -26,7 +26,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="bottom"
-            android:layout_marginTop="70dp"
+            android:layout_marginTop="90dp"
             android:clipChildren="false"
             android:layoutAnimation="@anim/rv_layout_animation"
             android:overScrollMode="never"
@@ -37,7 +37,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="50dp"
             android:padding="10dp"
             android:src="@drawable/ic_slider_line"/>
 

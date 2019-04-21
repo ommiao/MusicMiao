@@ -11,4 +11,8 @@ public class UIUtil {
                 dpVal, App.getContext().getResources().getDisplayMetrics());
     }
 
+    public static int getScreenWidth(){
+        return App.getContext().getResources().getDisplayMetrics().widthPixels;
+    }
+
 }
