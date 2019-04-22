@@ -161,6 +161,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements D
     }
 
     private void checkHasDownloadingTask() {
+        if(mSweetSheet.isShow()){
+            mSweetSheet.dismiss();
+            return;
+        }
         if(hasDownloadingTask()){
             showFinishConfirmDialog();
         } else {
