@@ -1,8 +1,8 @@
 package cn.ommiao.musicmiao.ui.music;
 
 import android.animation.Animator;
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -39,6 +39,8 @@ import cn.ommiao.musicmiao.utils.StringUtil;
 import cn.ommiao.musicmiao.utils.ToastUtil;
 import cn.ommiao.musicmiao.widget.SquareImageView;
 import cn.ommiao.network.SimpleRequestCallback;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class SearchFragment extends BaseFragment<FragmentSearchBinding> implements
         View.OnClickListener,
@@ -89,6 +91,46 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
         adapter.setOnItemClickListener(this::onItemClick);
         mBinding.rvMusic.getViewTreeObserver().addOnPreDrawListener(this);
         mBinding.fabDownload.setOnClickListener(this::onDownloadClick);
+    }
+
+    @Override
+    protected void initData() {
+        SharedPreferences preferences = mActivity.getSharedPreferences("cache", MODE_PRIVATE);
+        boolean isFirstUse = preferences.getBoolean("isFirstUse", true);
+        if(isFirstUse){
+            new Thread(() -> {
+                try {
+                    Thread.sleep(REVEAL_DURATION);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mActivity.runOnUiThread(this::showDownloadPathTips);
+            }).start();
+        }
+    }
+
+    private void showDownloadPathTips() {
+        CustomDialogFragment customDialogFragment = new CustomDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("content", getString(R.string.music_download_path_tips));
+        bundle.putBoolean("justConfirm", true);
+        bundle.putString("rightBtnStr", getString(R.string.i_know));
+        customDialogFragment.setArguments(bundle);
+        customDialogFragment.setOnClickActionListener(new CustomDialogFragment.OnClickActionListener() {
+            @Override
+            public void onLeftClick() {
+
+            }
+
+            @Override
+            public void onRightClick() {
+                SharedPreferences preferences = mActivity.getSharedPreferences("cache", MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean("isFirstUse", false);
+                editor.apply();
+            }
+        });
+        customDialogFragment.show(mActivity.getSupportFragmentManager(), CustomDialogFragment.class.getSimpleName());
     }
 
     private void initAdapterLoadMore() {

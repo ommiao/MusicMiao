@@ -1,6 +1,5 @@
 package cn.ommiao.musicmiao.ui.music;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,35 +61,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements D
 
     @Override
     protected void initData() {
-        SharedPreferences preferences = getSharedPreferences("cache", MODE_PRIVATE);
-        boolean isFirstUse = preferences.getBoolean("isFirstUse", true);
-        if(isFirstUse){
-            showDownloadPathTips();
-        }
-    }
 
-    private void showDownloadPathTips() {
-        CustomDialogFragment customDialogFragment = new CustomDialogFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("content", getString(R.string.music_download_path_tips));
-        bundle.putBoolean("justConfirm", true);
-        bundle.putString("rightBtnStr", getString(R.string.i_know));
-        customDialogFragment.setArguments(bundle);
-        customDialogFragment.setOnClickActionListener(new CustomDialogFragment.OnClickActionListener() {
-            @Override
-            public void onLeftClick() {
-
-            }
-
-            @Override
-            public void onRightClick() {
-                SharedPreferences preferences = getSharedPreferences("cache", MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean("isFirstUse", false);
-                editor.apply();
-            }
-        });
-        customDialogFragment.show(getSupportFragmentManager(), CustomDialogFragment.class.getSimpleName());
     }
 
     @Override
@@ -127,6 +98,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements D
         }
         if(status == SongTask.DOWNLOAD_STATUS_DOWNLOADING){
             Aria.download(this).load(songTask.getUrl()).stop();
+        } else if(status == SongTask.DOWNLOAD_STATUS_ERROR){
+            songTask.setDownloadStatus(SongTask.DOWNLOAD_STATUS_WAIT);
+            Aria.download(this).load(songTask.getUrl()).start();
         } else {
             Aria.download(this).load(songTask.getUrl()).start();
         }
