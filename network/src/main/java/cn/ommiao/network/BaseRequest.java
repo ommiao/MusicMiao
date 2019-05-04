@@ -6,17 +6,20 @@ import com.orhanobut.logger.Logger;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.HeaderMap;
-import retrofit2.http.Headers;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
 import retrofit2.http.Url;
 
 public abstract class BaseRequest<IN extends RequestInBase, OUT extends RequestOutBase> {
@@ -45,13 +48,34 @@ public abstract class BaseRequest<IN extends RequestInBase, OUT extends RequestO
         final BaseInterface interf = retrofit.create(BaseInterface.class);
         HashMap<String, String> params = param.toHashMap();
         if(method() == POST){
-            call = interf.postCall(headers(), getRealApi(api(), params));
+            call = interf.postCall(headers(), getRealApi(api(), params), getRequestBody(param.body()));
         } else {
             call = interf.getCall(headers(), getRealApi(api(), params));
         }
         url = call.request().url().toString();
         Logger.d("--->" + url + " | params : " + params.toString());
         return this;
+    }
+
+    private RequestBody getRequestBody(HashMap<String, String> hashMap) {
+        StringBuilder data = new StringBuilder();
+        if (hashMap != null && hashMap.size() > 0) {
+            Iterator iter = hashMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry entry = (Map.Entry) iter.next();
+                Object key = entry.getKey();
+                Object val = entry.getValue();
+                data.append(key).append("=").append(val).append("&");
+            }
+        }
+
+        String jso = "";
+
+        if(data.length() > 0){
+            jso = data.substring(0, data.length() - 1);
+        }
+
+        return RequestBody.create(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"), jso);
     }
 
     private void initRetrofit() {
@@ -114,7 +138,6 @@ public abstract class BaseRequest<IN extends RequestInBase, OUT extends RequestO
         RequestCallBack<OUT> requestCallBack = callBackWeakReference.get();
         if (requestCallBack != null) {
             ResponseBody body = response.body();
-            Logger.d("<---" + url + " | code : " + response.code());
             if (response.isSuccessful() && body != null) {
                 try {
                     String res = body.string();
@@ -205,8 +228,9 @@ public abstract class BaseRequest<IN extends RequestInBase, OUT extends RequestO
         @POST
         Call<ResponseBody> postCall(
                 @HeaderMap HashMap<String, String> headers,
-                @Url String url
-        );
+                @Url String url,
+                @Body RequestBody body
+                );
 
         @GET
         Call<ResponseBody> getCall(

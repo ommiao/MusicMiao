@@ -39,11 +39,18 @@ import java.util.List;
 import cn.ommiao.musicmiao.R;
 import cn.ommiao.musicmiao.bean.SongTask;
 import cn.ommiao.musicmiao.bean.Song;
+import cn.ommiao.musicmiao.bean.moresound.Api;
 import cn.ommiao.musicmiao.databinding.FragmentMusicDetailBinding;
 import cn.ommiao.musicmiao.databinding.LayoutMusicDownloadBinding;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.LyricsQueryCall;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryIn;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryOut;
+import cn.ommiao.musicmiao.httpcall.moresound.songinfo.SongInfoCall;
+import cn.ommiao.musicmiao.httpcall.moresound.songinfo.model.SongInfoIn;
+import cn.ommiao.musicmiao.httpcall.moresound.songinfo.model.SongInfoOut;
+import cn.ommiao.musicmiao.httpcall.moresound.url.UrlCall;
+import cn.ommiao.musicmiao.httpcall.moresound.url.model.UrlIn;
+import cn.ommiao.musicmiao.httpcall.moresound.url.model.UrlOut;
 import cn.ommiao.musicmiao.httpcall.vkey.VkeyCall;
 import cn.ommiao.musicmiao.httpcall.vkey.model.VkeyIn;
 import cn.ommiao.musicmiao.httpcall.vkey.model.VkeyOut;
@@ -66,6 +73,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     private Song song;
     private SweetSheet mSweetSheet;
     private boolean downloadLinkPrepared = false;
+    private boolean mp3NqLinkPrepared, mp3HqLinkPrepared, flacLinkPrepared, apeLinkPrepared;
     private String fileName;
     private LayoutMusicDownloadBinding downloadBinding;
 
@@ -132,7 +140,8 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     @Override
     protected void initData() {
         requestLyrics();
-        requestVkey();
+        //requestVkey();
+        requestDownloadUrl();
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -199,11 +208,12 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     }
 
     private void onMp3NormalClick() {
-        if (!isDownloadLinkPrepared()) {
-            return;
-        }
         if (!song.getFile().hasNqMp3()) {
             ToastUtil.show(R.string.music_download_no_quality);
+            return;
+        }
+        if (!mp3NqLinkPrepared) {
+            ToastUtil.show(R.string.music_link_initing);
             return;
         }
         //download start
@@ -211,11 +221,12 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     }
 
     private void onMp3HighClick() {
-        if (!isDownloadLinkPrepared()) {
-            return;
-        }
         if (!song.getFile().hasHqMp3()) {
             ToastUtil.show(R.string.music_download_no_quality);
+            return;
+        }
+        if (!mp3HqLinkPrepared) {
+            ToastUtil.show(R.string.music_link_initing);
             return;
         }
         //download start
@@ -223,11 +234,12 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     }
 
     private void onFlacClick() {
-        if (!isDownloadLinkPrepared()) {
-            return;
-        }
         if (!song.getFile().hasFlac()) {
             ToastUtil.show(R.string.music_download_no_quality);
+            return;
+        }
+        if (!flacLinkPrepared) {
+            ToastUtil.show(R.string.music_link_initing);
             return;
         }
         //download start
@@ -235,11 +247,12 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
     }
 
     private void onApeClick() {
-        if (!isDownloadLinkPrepared()) {
-            return;
-        }
         if (!song.getFile().hasApe()) {
             ToastUtil.show(R.string.music_download_no_quality);
+            return;
+        }
+        if (!apeLinkPrepared) {
+            ToastUtil.show(R.string.music_link_initing);
             return;
         }
         //download start
@@ -449,6 +462,88 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
                 ToastUtil.show(getString(R.string.music_download_init_error) + error);
             }
         });
+    }
+
+    private void requestDownloadUrl(){
+        SongInfoIn in = new SongInfoIn(song.getMid());
+        newCall(new SongInfoCall(), in, new SimpleRequestCallback<SongInfoOut>() {
+            @Override
+            public void onSuccess(SongInfoOut out) {
+                Logger.d(out.getApi().getMp3Nq());
+                Logger.d(out.getApi().getMp3Hq());
+                Logger.d(out.getApi().getFlac());
+                Logger.d(out.getApi().getApe());
+                getDownloadUrls(out.getApi());
+            }
+
+            @Override
+            public void onError(int code, String error) {
+                ToastUtil.show(getString(R.string.music_download_init_error) + error);
+            }
+        });
+    }
+
+    private void getDownloadUrls(Api api) {
+        if(song.getFile().hasNqMp3()){
+            UrlIn mp3NqIn = new UrlIn(api.getMp3Nq());
+            newCall(new UrlCall(), mp3NqIn, new SimpleRequestCallback<UrlOut>() {
+                @Override
+                public void onSuccess(UrlOut out) {
+                    song.setMp3NqLink(out.getUrl());
+                    mp3NqLinkPrepared = true;
+                }
+
+                @Override
+                public void onError(int code, String error) {
+                    ToastUtil.show("普通音质mp3链接初始化失败！");
+                }
+            });
+        }
+        if(song.getFile().hasHqMp3()){
+            UrlIn mp3HqIn = new UrlIn(api.getMp3Hq());
+            newCall(new UrlCall(), mp3HqIn, new SimpleRequestCallback<UrlOut>() {
+                @Override
+                public void onSuccess(UrlOut out) {
+                    song.setMp3HqLink(out.getUrl());
+                    mp3HqLinkPrepared = true;
+                }
+
+                @Override
+                public void onError(int code, String error) {
+                    ToastUtil.show("高音质mp3链接初始化失败！");
+                }
+            });
+        }
+        if(song.getFile().hasFlac()){
+            UrlIn flacIn = new UrlIn(api.getFlac());
+            newCall(new UrlCall(), flacIn, new SimpleRequestCallback<UrlOut>() {
+                @Override
+                public void onSuccess(UrlOut out) {
+                    song.setFlacLink(out.getUrl());
+                    flacLinkPrepared = true;
+                }
+
+                @Override
+                public void onError(int code, String error) {
+                    ToastUtil.show("flac链接初始化失败！");
+                }
+            });
+        }
+        if(song.getFile().hasApe()){
+            UrlIn apeIn = new UrlIn(api.getMp3Hq());
+            newCall(new UrlCall(), apeIn, new SimpleRequestCallback<UrlOut>() {
+                @Override
+                public void onSuccess(UrlOut out) {
+                    song.setApeLink(out.getUrl());
+                    apeLinkPrepared = true;
+                }
+
+                @Override
+                public void onError(int code, String error) {
+                    ToastUtil.show("ape链接初始化失败！");
+                }
+            });
+        }
     }
 
     private void generateMusicLink(String vkey) {
