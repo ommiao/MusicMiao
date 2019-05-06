@@ -28,6 +28,17 @@
             android:visibility="invisible"/>
 
         <ImageView
+            android:id="@+id/iv_folder"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/icon_folder"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/iv_close"
+            android:layout_marginStart="5dp"
+            android:layout_marginBottom="20dp"
+            tools:ignore="ContentDescription"/>
+
+        <ImageView
             android:id="@+id/iv_close"
             android:layout_width="24dp"
             android:layout_height="24dp"

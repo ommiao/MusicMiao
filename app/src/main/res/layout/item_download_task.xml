@@ -38,6 +38,7 @@
                 android:layout_height="wrap_content"
                 tools:text="你要的全拿走-胡彦斌.mp3"
                 android:ellipsize="middle"
+                android:singleLine="true"
                 android:textSize="15sp"
                 android:textColor="@android:color/black"/>
 

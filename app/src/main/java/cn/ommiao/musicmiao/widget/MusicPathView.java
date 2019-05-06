@@ -18,7 +18,7 @@ import cn.ommiao.musicmiao.widget.playpause.SimpleAnimatorListener;
 
 public class MusicPathView extends View {
 
-    private static final long DURATION = 800;
+    private static final long DURATION = 600;
 
     private int width = 200, height = 200;
     private Path pathStart = new Path(), pathEnd = new Path();

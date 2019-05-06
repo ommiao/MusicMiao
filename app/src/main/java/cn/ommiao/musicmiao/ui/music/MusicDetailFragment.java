@@ -2,6 +2,7 @@ package cn.ommiao.musicmiao.ui.music;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -62,7 +63,7 @@ import cn.ommiao.network.SimpleRequestCallback;
 
 public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding> {
 
-    private static final String MUSIC_DOWNLOAD_PATH = "MiaoLe/Music";
+    private static String MUSIC_DOWNLOAD_PATH = "MiaoLe/Music";
 
     private static final String SUFFIX_MP3_NQ = "-NQ.mp3";
     private static final String SUFFIX_MP3_HQ = "-HQ.mp3";
@@ -131,6 +132,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         downloadBinding = DataBindingUtil.bind(view);
         assert downloadBinding != null;
         downloadBinding.ivClose.setOnClickListener(v -> closeDownloadView());
+        downloadBinding.ivFolder.setOnClickListener(v -> showEditFolderView());
         downloadBinding.flMp3Normal.setOnClickListener(v -> onMp3NormalClick());
         downloadBinding.flMp3High.setOnClickListener(v -> onMp3HighClick());
         downloadBinding.flFlac.setOnClickListener(v -> onFlacClick());
@@ -140,6 +142,8 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
 
     @Override
     protected void initData() {
+        SharedPreferences preferences = mActivity.getPreferences(Context.MODE_PRIVATE);
+        MUSIC_DOWNLOAD_PATH = preferences.getString("DownLoadPath", "MiaoLe/Music");
         requestLyrics();
         requestDownloadApi();
     }
@@ -212,14 +216,14 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             ToastUtil.show(R.string.music_download_no_quality);
             return;
         }
+        if(isDownloadingOrDownloaded(SUFFIX_MP3_NQ)){
+            return;
+        }
         if (!isDownloadLinkPrepared()) {
             return;
         }
         if(!listenLinkPrepared){
             ToastUtil.show(R.string.music_link_initing);
-            return;
-        }
-        if(isDownloadingOrDownloaded(SUFFIX_MP3_NQ)){
             return;
         }
         //download start
@@ -231,14 +235,14 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             ToastUtil.show(R.string.music_download_no_quality);
             return;
         }
+        if(isDownloadingOrDownloaded(SUFFIX_MP3_HQ)){
+            return;
+        }
         if (!isDownloadLinkPrepared()) {
             return;
         }
         if(isRequestingLink()){
             ToastUtil.show("正在添加下载，请稍候");
-            return;
-        }
-        if(isDownloadingOrDownloaded(SUFFIX_MP3_HQ)){
             return;
         }
         //download start
@@ -250,14 +254,14 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             ToastUtil.show(R.string.music_download_no_quality);
             return;
         }
+        if(isDownloadingOrDownloaded(SUFFIX_FLAC)){
+            return;
+        }
         if (!isDownloadLinkPrepared()) {
             return;
         }
         if(isRequestingLink()){
             ToastUtil.show("正在添加下载，请稍候");
-            return;
-        }
-        if(isDownloadingOrDownloaded(SUFFIX_FLAC)){
             return;
         }
         //download start
@@ -269,14 +273,14 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
             ToastUtil.show(R.string.music_download_no_quality);
             return;
         }
+        if(isDownloadingOrDownloaded(SUFFIX_APE)){
+            return;
+        }
         if (!isDownloadLinkPrepared()) {
             return;
         }
         if(isRequestingLink()){
             ToastUtil.show("正在添加下载，请稍候");
-            return;
-        }
-        if(isDownloadingOrDownloaded(SUFFIX_APE)){
             return;
         }
         //download start
@@ -676,5 +680,23 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         }
         handler.removeCallbacks(progressRunnable);
         super.onDestroyView();
+    }
+
+    private void showEditFolderView(){
+        FolderEditFragment folderEditFragment = new FolderEditFragment();
+        folderEditFragment.setOnDoneActionListener(new FolderEditFragment.OnDoneActionListener(){
+
+            @Override
+            public void onConfirmClick(String path) {
+                MUSIC_DOWNLOAD_PATH = path;
+                initLocalFileStatus();
+            }
+
+            @Override
+            public void onCancelClick() {
+
+            }
+        });
+        folderEditFragment.show(mActivity.getSupportFragmentManager(), FolderEditFragment.class.getSimpleName());
     }
 }

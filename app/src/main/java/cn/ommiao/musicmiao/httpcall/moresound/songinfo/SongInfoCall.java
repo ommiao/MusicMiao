@@ -32,6 +32,7 @@ public class SongInfoCall extends BaseRequest<SongInfoIn, SongInfoOut> {
         res = res.replace("320MP3", "mp3Hq");
         res = res.replace("FLAC", "flac");
         res = res.replace("APE", "ape");
+        res = res.replace("msg", "message");
         return res;
     }
 }
