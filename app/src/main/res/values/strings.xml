@@ -38,4 +38,5 @@
     <string name="music_download_path_tips">下载的音乐文件将会保存至sdcard/MiaoLe/Music目录。</string>
     <string name="i_know">我知道了</string>
     <string name="music_download_no_task">无下载任务</string>
+    <string name="music_notify_error">通知媒体库更新异常</string>
 </resources>

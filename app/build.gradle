@@ -6,8 +6,8 @@ android {
         applicationId "cn.ommiao.music"
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 2
-        versionName "1.0.3"
+        versionCode 3
+        versionName "1.0.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         dataBinding{
             enabled true

@@ -1,5 +1,7 @@
 package cn.ommiao.musicmiao.ui.music;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,7 @@ import cn.ommiao.musicmiao.bean.SongTask;
 import cn.ommiao.musicmiao.databinding.ActivityMainBinding;
 import cn.ommiao.musicmiao.interfaces.DownloadActionListener;
 import cn.ommiao.musicmiao.ui.base.BaseActivity;
+import cn.ommiao.musicmiao.utils.ToastUtil;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements DownloadActionListener {
 
@@ -145,6 +148,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements D
     @Download.onTaskComplete void taskComplete(DownloadTask task) {
         Logger.d("taskComplete:" + task.getEntity().toString());
         taskAdapter.updateTask(task);
+        try {
+            Uri uri = Uri.parse("file://" + task.getDownloadPath());
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+        } catch (Exception e){
+            ToastUtil.show(R.string.music_notify_error);
+            e.printStackTrace();
+        }
     }
 
     @Override
