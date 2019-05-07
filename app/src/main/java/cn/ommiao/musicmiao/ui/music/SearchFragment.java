@@ -37,6 +37,7 @@ import cn.ommiao.musicmiao.interfaces.DownloadActionListener;
 import cn.ommiao.musicmiao.ui.base.BaseFragment;
 import cn.ommiao.musicmiao.utils.StringUtil;
 import cn.ommiao.musicmiao.utils.ToastUtil;
+import cn.ommiao.musicmiao.utils.WebViewUtil;
 import cn.ommiao.musicmiao.widget.SquareImageView;
 import cn.ommiao.network.SimpleRequestCallback;
 
@@ -294,22 +295,38 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> implemen
     }
 
     private void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-        SquareImageView albumView = view.findViewById(R.id.siv_music_album);
-        Song song = songs.get(position);
+        WebViewUtil.getInstance().getWebViewParam("window.a", value -> {
+            if(StringUtil.isEmpty(value)){
+                showWaitTips();
+            } else {
+                SquareImageView albumView = view.findViewById(R.id.siv_music_album);
+                Song song = songs.get(position);
+                Bundle bundle = new Bundle();
+                MusicDetailFragment detailFragment = new MusicDetailFragment();
+                detailFragment.setDownloadActionListener((DownloadActionListener) mActivity);
+                mActivity.setOnBackPressedListener(detailFragment);
+                bundle.putSerializable("song", song);
+                bundle.putString("tran_name", song.getMid());
+                detailFragment.setArguments(bundle);
+                assert getFragmentManager() != null;
+                getFragmentManager()
+                        .beginTransaction()
+                        .addSharedElement(albumView, song.getMid())
+                        .addToBackStack("detail")
+                        .replace(R.id.fl_container, detailFragment)
+                        .commit();
+            }
+        });
+    }
+
+    private void showWaitTips() {
+        CustomDialogFragment customDialogFragment = new CustomDialogFragment();
         Bundle bundle = new Bundle();
-        MusicDetailFragment detailFragment = new MusicDetailFragment();
-        detailFragment.setDownloadActionListener((DownloadActionListener) mActivity);
-        mActivity.setOnBackPressedListener(detailFragment);
-        bundle.putSerializable("song", song);
-        bundle.putString("tran_name", song.getMid());
-        detailFragment.setArguments(bundle);
-        assert getFragmentManager() != null;
-        getFragmentManager()
-                .beginTransaction()
-                .addSharedElement(albumView, song.getMid())
-                .addToBackStack("detail")
-                .replace(R.id.fl_container, detailFragment)
-                .commit();
+        bundle.putString("content", getString(R.string.music_param_initing));
+        bundle.putBoolean("justConfirm", true);
+        bundle.putString("rightBtnStr", getString(R.string.i_know));
+        customDialogFragment.setArguments(bundle);
+        customDialogFragment.show(mActivity.getSupportFragmentManager(), CustomDialogFragment.class.getSimpleName());
     }
 
     private void onDownloadClick(View v){

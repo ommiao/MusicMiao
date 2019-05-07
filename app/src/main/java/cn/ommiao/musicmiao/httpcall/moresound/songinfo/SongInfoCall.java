@@ -1,10 +1,18 @@
 package cn.ommiao.musicmiao.httpcall.moresound.songinfo;
 
+import java.util.HashMap;
+
 import cn.ommiao.musicmiao.httpcall.moresound.songinfo.model.SongInfoIn;
 import cn.ommiao.musicmiao.httpcall.moresound.songinfo.model.SongInfoOut;
 import cn.ommiao.network.BaseRequest;
 
 public class SongInfoCall extends BaseRequest<SongInfoIn, SongInfoOut> {
+
+    private String C0ntentLength;
+
+    public SongInfoCall(String C0ntentLength){
+        this.C0ntentLength = C0ntentLength;
+    }
 
     @Override
     protected String api() {
@@ -34,5 +42,14 @@ public class SongInfoCall extends BaseRequest<SongInfoIn, SongInfoOut> {
         res = res.replace("APE", "ape");
         res = res.replace("msg", "message");
         return res;
+    }
+
+    @Override
+    protected HashMap<String, String> headers() {
+        return new HashMap<String, String>(){
+            {
+                put("C0ntent-Length", C0ntentLength);
+            }
+        };
     }
 }

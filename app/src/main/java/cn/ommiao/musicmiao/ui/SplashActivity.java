@@ -11,11 +11,13 @@ import android.support.v4.content.ContextCompat;
 import org.litepal.LitePal;
 
 import cn.ommiao.musicmiao.R;
+import cn.ommiao.musicmiao.core.App;
 import cn.ommiao.musicmiao.databinding.ActivitySplashBinding;
 import cn.ommiao.musicmiao.ui.base.BaseActivity;
 import cn.ommiao.musicmiao.ui.music.CustomDialogFragment;
 import cn.ommiao.musicmiao.ui.music.MainActivity;
 import cn.ommiao.musicmiao.utils.ToastUtil;
+import cn.ommiao.musicmiao.utils.WebViewUtil;
 import cn.ommiao.musicmiao.widget.MusicPathView;
 
 public class SplashActivity extends BaseActivity<ActivitySplashBinding> implements CustomDialogFragment.OnClickActionListener, MusicPathView.OnAnimationEndListener {
@@ -53,6 +55,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> implemen
     @Override
     protected void initData() {
         LitePal.getDatabase();
+        WebViewUtil.init(App.getContext());
     }
 
     private void requestPermission() {
