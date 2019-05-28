@@ -1,5 +1,7 @@
 package cn.ommiao.musicmiao.ui.music;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -145,6 +147,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements D
     @Download.onTaskComplete void taskComplete(DownloadTask task) {
         Logger.d("taskComplete:" + task.getEntity().toString());
         taskAdapter.updateTask(task);
+        try {
+            Uri uri = Uri.parse("file://" + task.getDownloadPath());
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

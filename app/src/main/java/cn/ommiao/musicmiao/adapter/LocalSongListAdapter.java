@@ -48,7 +48,7 @@ public class LocalSongListAdapter extends BaseQuickAdapter<LocalSong, BaseViewHo
             item = songsInDb.get(0);
             item.setPlaying(isPlaying);
         } else {
-            MusicSearchIn in = new MusicSearchIn(item.getTitle(), 1, 1);
+            MusicSearchIn in = new MusicSearchIn(item.getTitle() + " " + item.getSinger(), 1, 1);
             LocalSong finalItem = item;
             httpCall.newCall(new MusicSearchCall(), in, new SimpleRequestCallback<MusicSearchOut>() {
                 @Override

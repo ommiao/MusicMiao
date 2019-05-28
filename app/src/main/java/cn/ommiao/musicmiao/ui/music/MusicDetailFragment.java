@@ -2,6 +2,7 @@ package cn.ommiao.musicmiao.ui.music;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -25,7 +26,6 @@ import com.lauzy.freedom.library.LrcHelper;
 import com.mingle.sweetpick.CustomDelegate;
 import com.mingle.sweetpick.DimEffect;
 import com.mingle.sweetpick.SweetSheet;
-import com.orhanobut.logger.Logger;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -37,16 +37,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.ommiao.musicmiao.R;
-import cn.ommiao.musicmiao.bean.SongTask;
 import cn.ommiao.musicmiao.bean.Song;
+import cn.ommiao.musicmiao.bean.SongTask;
 import cn.ommiao.musicmiao.databinding.FragmentMusicDetailBinding;
 import cn.ommiao.musicmiao.databinding.LayoutMusicDownloadBinding;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.LyricsQueryCall;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryIn;
 import cn.ommiao.musicmiao.httpcall.lyricsquery.model.LyricsQueryOut;
-import cn.ommiao.musicmiao.httpcall.vkey.VkeyCall;
-import cn.ommiao.musicmiao.httpcall.vkey.model.VkeyIn;
-import cn.ommiao.musicmiao.httpcall.vkey.model.VkeyOut;
+import cn.ommiao.musicmiao.httpcall.musiclink.MusicLinkCall;
+import cn.ommiao.musicmiao.httpcall.musiclink.models.MusicLinkIn;
+import cn.ommiao.musicmiao.httpcall.musiclink.models.MusicLinkOut;
 import cn.ommiao.musicmiao.interfaces.DownloadActionListener;
 import cn.ommiao.musicmiao.ui.base.BaseFragment;
 import cn.ommiao.musicmiao.utils.StringUtil;
@@ -55,7 +55,7 @@ import cn.ommiao.network.SimpleRequestCallback;
 
 public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding> {
 
-    private static final String MUSIC_DOWNLOAD_PATH = "MiaoLe/Music";
+    private static String MUSIC_DOWNLOAD_PATH = "MiaoLe/Music";
 
     private static final String SUFFIX_MP3_NQ = "-NQ.mp3";
     private static final String SUFFIX_MP3_HQ = "-HQ.mp3";
@@ -122,6 +122,7 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         downloadBinding = DataBindingUtil.bind(view);
         assert downloadBinding != null;
         downloadBinding.ivClose.setOnClickListener(v -> closeDownloadView());
+        downloadBinding.ivFolder.setOnClickListener(v -> showEditFolderView());
         downloadBinding.flMp3Normal.setOnClickListener(v -> onMp3NormalClick());
         downloadBinding.flMp3High.setOnClickListener(v -> onMp3HighClick());
         downloadBinding.flFlac.setOnClickListener(v -> onFlacClick());
@@ -131,8 +132,27 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
 
     @Override
     protected void initData() {
+        SharedPreferences preferences = mActivity.getPreferences(Context.MODE_PRIVATE);
+        MUSIC_DOWNLOAD_PATH = preferences.getString("DownLoadPath", "MiaoLe/Music");
         requestLyrics();
-        requestVkey();
+        requestListenLink();
+    }
+
+    private void requestListenLink() {
+        String b = "M500" + song.getFile().getMedia_mid() + ".mp3";
+        MusicLinkIn in = new MusicLinkIn(b, song.getMid(), song.getFile().getMedia_mid());
+        newCall(new MusicLinkCall(), in, new SimpleRequestCallback<MusicLinkOut>() {
+            @Override
+            public void onSuccess(MusicLinkOut out) {
+                song.setMp3NqLink(out.getLink());
+                downloadLinkPrepared = true;
+            }
+
+            @Override
+            public void onError(int code, String error) {
+                ToastUtil.show("获取试听连接失败！");
+            }
+        });
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -429,58 +449,6 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         });
     }
 
-    private void requestVkey() {
-        VkeyIn in = new VkeyIn();
-        newCall(new VkeyCall(), in, new SimpleRequestCallback<VkeyOut>() {
-            @Override
-            public void onSuccess(VkeyOut out) {
-                if (out.isDataValid()) {
-                    generateMusicLink(out.getVkey());
-                    downloadLinkPrepared = true;
-                    Logger.d("mp3 nq: " + song.getMp3NqLink());
-                    Logger.d("mp3 hq: " + song.getMp3HqLink());
-                    Logger.d("flac: " + song.getFlacLink());
-                    Logger.d("ape: " + song.getApeLink());
-                }
-            }
-
-            @Override
-            public void onError(int code, String error) {
-                ToastUtil.show(getString(R.string.music_download_init_error) + error);
-            }
-        });
-    }
-
-    private void generateMusicLink(String vkey) {
-
-        String mp3NqLink = "http://streamoc.music.tc.qq.com/M500" +
-                song.getFile().getStrMediaMid() +
-                ".mp3?vkey=" +
-                vkey +
-                "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=8";
-        song.setMp3NqLink(mp3NqLink);
-
-        String mp3HqLink = "http://mobileoc.music.tc.qq.com/M800" +
-                song.getFile().getStrMediaMid() +
-                ".mp3?vkey=" +
-                vkey +
-                "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=68";
-        song.setMp3HqLink(mp3HqLink);
-
-        String mp3FlacLink = "http://mobileoc.music.tc.qq.com/F000" +
-                song.getFile().getStrMediaMid() +
-                ".flac?vkey=" +
-                vkey +
-                "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=63";
-        song.setFlacLink(mp3FlacLink);
-
-        String mp3ApeLink = "http://mobileoc.music.tc.qq.com/A000" +
-                song.getFile().getStrMediaMid() +
-                ".ape?vkey=" +
-                vkey +
-                "&guid=00000000736cfed1fffffffff9ffbfd7&uin=0&fromtag=8";
-        song.setApeLink(mp3ApeLink);
-    }
 
     @Override
     public boolean interceptBackAction() {
@@ -532,5 +500,23 @@ public class MusicDetailFragment extends BaseFragment<FragmentMusicDetailBinding
         }
         handler.removeCallbacks(progressRunnable);
         super.onDestroyView();
+    }
+
+    private void showEditFolderView(){
+        FolderEditFragment folderEditFragment = new FolderEditFragment();
+        folderEditFragment.setOnDoneActionListener(new FolderEditFragment.OnDoneActionListener(){
+
+            @Override
+            public void onConfirmClick(String path) {
+                MUSIC_DOWNLOAD_PATH = path;
+                initLocalFileStatus();
+            }
+
+            @Override
+            public void onCancelClick() {
+
+            }
+        });
+        folderEditFragment.show(mActivity.getSupportFragmentManager(), FolderEditFragment.class.getSimpleName());
     }
 }
