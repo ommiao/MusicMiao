@@ -21,6 +21,7 @@
                 android:visibility="visible"/>
 
             <TextView
+                android:id="@+id/tv_empty_tips"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/music_local_empty_tips"

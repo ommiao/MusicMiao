@@ -6,6 +6,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -42,6 +43,8 @@ public class LocalMusicFragment extends BaseFragment<FragmentLocalMusicBinding> 
     private Handler handler = new Handler();
     private String currentPath;
 
+    private TextView tvEmptyTips;
+
     @Override
     protected void initViews() {
         int sHeight = ImmersionBar.getStatusBarHeight(mActivity);
@@ -53,6 +56,7 @@ public class LocalMusicFragment extends BaseFragment<FragmentLocalMusicBinding> 
             return true;
         });
         View emptyView = LayoutInflater.from(mActivity).inflate(R.layout.layout_music_list_local_empty, null);
+        tvEmptyTips = emptyView.findViewById(R.id.tv_empty_tips);
         adapter = new LocalSongListAdapter(R.layout.item_music_local, localSongs, this);
         adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM);
         adapter.setOnItemClickListener(this);
@@ -69,9 +73,17 @@ public class LocalMusicFragment extends BaseFragment<FragmentLocalMusicBinding> 
 
     @Override
     protected void initData() {
-        ArrayList<LocalSong> songs = MusicUtil.getMusicData(mActivity);
-        localSongs.addAll(songs);
-        adapter.notifyDataSetChanged();
+        tvEmptyTips.setText(R.string.music_local_loading);
+        new Thread(() -> {
+            ArrayList<LocalSong> songs = MusicUtil.getMusicData(mActivity);
+            localSongs.addAll(songs);
+            mActivity.runOnUiThread(() -> {
+                adapter.notifyDataSetChanged();
+                if(localSongs.size() == 0){
+                    tvEmptyTips.setText(R.string.music_local_empty_tips);
+                }
+            });
+        }).start();
         mediaPlayer = new MediaPlayer();
     }
 

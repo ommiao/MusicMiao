@@ -34,6 +34,7 @@
     <string name="music_lyrics_loading">加载歌词中…</string>
     <string name="music_lyrics_none">暂无歌词</string>
     <string name="music_local_empty_tips">未扫描到本地音乐</string>
+    <string name="music_local_loading">正在扫描本地音乐</string>
     <string name="music_downloading_list_no_empty">有正在进行的下载任务，退出后需要重新下载，确定退出吗？</string>
     <string name="music_download_path_tips">下载的音乐文件默认保存至根目录/MiaoLe/Music目录下，可在下载时自定义路径。</string>
     <string name="i_know">我知道了</string>
